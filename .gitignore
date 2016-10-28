@@ -1,0 +1,5 @@
+vendor
+backend/build
+backend/phpunit.xml
+node_modules
+frontend/public/bundle.js
