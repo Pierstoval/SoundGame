@@ -1,0 +1,247 @@
+<?php
+
+namespace Orbitale\SoundGame\Game;
+
+use Evenement\EventEmitterTrait;
+use React\EventLoop\LoopInterface;
+use Orbitale\SoundGame\Event\Event;
+use Orbitale\SoundGame\Geometry\Circle;
+use Orbitale\SoundGame\Geometry\Point;
+use Orbitale\SoundGame\Model\GameObjects\Food;
+use Orbitale\SoundGame\Model\Map;
+use Orbitale\SoundGame\Model\Player;
+
+class Game
+{
+    const DEFAULT_TICK_INTERVAL = 25;
+    const DEFAULT_FOOD_APPEARANCE_TICK = 40;
+
+    use EventEmitterTrait;
+
+    /**
+     * @var Map
+     */
+    private $map;
+
+    /**
+     * In milliseconds.
+     *
+     * @var int
+     */
+    private $tickInterval;
+
+    /**
+     * @var Player[]
+     */
+    private $players = [];
+
+    /**
+     * @var LoopInterface
+     */
+    private $loop;
+
+    /**
+     * @var Event[]
+     */
+    private $awaitingEvents = [];
+
+    /**
+     * @var bool
+     */
+    private $isRunning = false;
+
+    /**
+     * @var int
+     */
+    private $foodTicks = self::DEFAULT_FOOD_APPEARANCE_TICK;
+
+    /**
+     * @param LoopInterface $loop
+     * @param int|null      $tickInterval
+     */
+    public function __construct(LoopInterface $loop, int $tickInterval = self::DEFAULT_TICK_INTERVAL)
+    {
+        $this->loop = $loop;
+        $this->tickInterval = $tickInterval;
+    }
+
+    /**
+     * Run the loop for the game to start.
+     */
+    public function run()
+    {
+        if ($this->isRunning) {
+            throw new \LogicException('Game is already running');
+        }
+
+        // Execute $this->tick() on every tick interval
+        $this->loop->addPeriodicTimer($this->tickInterval / 1000, [$this, 'tick']);
+
+        $this->isRunning = true;
+
+        $this->loop->run();
+    }
+
+    /**
+     * @param string $name
+     * @param string $direction
+     */
+    public function changeDirection(string $name, string $direction)
+    {
+        $player = $this->getPlayerByName($name);
+
+        if (!$player->canChangeDirection($direction)) {
+            throw new \InvalidArgumentException('Come on, you are snek, you cannot move towards your back.');
+        }
+
+        $player->changeDirection($direction);
+    }
+
+    /**
+     * @param string $name
+     */
+    public function initializePlayer(string $name)
+    {
+        $playerExists = $this->getPlayerByName($name, false);
+
+        if ($playerExists) {
+            return;
+        }
+
+        $player = new Player($this->map);
+        $player->hash = substr(md5(random_bytes(64)), 0, 16);
+        $player->name = $name;
+
+        $this->players[$player->hash] = $player;
+    }
+
+    /**
+     * @param string $name
+     * @param bool $exceptional
+     *
+     * @return Player|null
+     */
+    public function getPlayerByName(string $name, bool $exceptional = true)
+    {
+        foreach ($this->players as $player) {
+            if ($player->name === $name) {
+                return $player;
+            }
+        }
+
+        if ($exceptional) {
+            throw new \InvalidArgumentException('No such player');
+        }
+
+        return null;
+    }
+
+    /**
+     * @param $hash
+     *
+     * @return Player
+     */
+    public function getPlayerByHash(string $hash): Player
+    {
+        if (array_key_exists($hash, $this->players)) {
+            return $this->players[$hash];
+        }
+
+        throw new \InvalidArgumentException('No such player');
+    }
+
+    /**
+     * @return Player[]
+     */
+    public function getPlayers()
+    {
+        return $this->players;
+    }
+
+    /**
+     * @return Map
+     */
+    public function getMap()
+    {
+        return $this->map;
+    }
+
+    public function tick()
+    {
+        // Execute all events in the queue.
+        while ($event = array_shift($this->awaitingEvents)) {
+            // Change the keyPress status on each event.
+            $event->getPlayer()->keyPressed      = $event->isKeyPressed();
+            $event->getPlayer()->pick->direction = $event->getDirection();
+        }
+
+        // Create food elements in the field
+        if ($this->foodTicks <= 0 && count($this->players)) {
+            /** @var Player $randomPlayer */
+            $randomPlayer = $this->players[array_rand($this->players)];
+
+            $pickHead = $randomPlayer->pick->getBody();
+
+            // Randomly choose position but only do some attempts
+            $randomRange = function($start, $end, $min, $max) {
+                while ($random = rand($start, $end)) {
+                    if ($random < $min || $random > $max) {
+                        return $random;
+                    }
+                }
+            };
+
+
+            $food = new Food(
+                new Circle(
+                    new Point(
+                        $pickHead->getCenterPoint()->getX() + ($x = $randomRange(-500, 500, -100, 100)),
+                        $pickHead->getCenterPoint()->getY() + ($y = $randomRange(-500, 500, -100, 100))
+                    )
+                )
+            );
+
+            $this->map->foods[] = $food;
+
+            $this->foodTicks = self::DEFAULT_FOOD_APPEARANCE_TICK;
+        } else {
+            $this->foodTicks--;
+        }
+
+        foreach ($this->map->foods as $food) {
+            $food->lifetime--;
+
+            if ($food->lifetime === 0) {
+                unset($this->map->foods[array_search($food, $this->map->foods, true)]);
+                $food = null;
+            }
+        }
+
+        // Remove all players that have lost.
+        foreach ($this->players as $k => $player) {
+            if ($player->pick->destroyed) {
+                echo sprintf(
+                    'Player %s has lost!',
+                    $player->name
+                );
+
+                // Make sure player is correctly destroyed, to free memory.
+                $player->destroy();
+                unset($this->players[$k]);
+                $player = null;
+            }
+        }
+
+        // Move each player.
+        foreach ($this->players as $player) {
+            $movementSuccessful = $player->pick->move();
+
+            if (!$movementSuccessful) {
+                $this->emit(self::EVENT_COLLISION, [$player]);
+                $player->pick->destroyed = true;
+            }
+        }
+
+        $this->emit(self::EVENT_TICK, [$this]);
+    }
+}
