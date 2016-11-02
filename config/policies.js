@@ -55,6 +55,7 @@ module.exports.policies = {
      */
     UserController: {
         'find': true,
+        'create': true,
         'findOne': true,
     },
 };
