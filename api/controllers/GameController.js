@@ -1,36 +1,5 @@
 module.exports = {
-
-    create: function(req, res) {
-        var name;
-
-        if (!req.isSocket || req.method !== 'POST') {
-            return res.badRequest();
-        }
-
-        name = req.param('name');
-
-        if (!name.toLowerCase().trim().match(/^[a-z0-9_-]+$/gi)) {
-            res.status(400);
-            res.view('400', {message: 'Name not valid. Must match contain only alphanumerical characters.'});
-
-            return res.send();
-        }
-
-        User.findOrCreateNewUser(name, function(err, user){
-
-            console.info('findByName', err, user);
-
-            if (user && user.name) {
-                console.info('Found !');
-                res.ok({
-                    user: user
-                });
-            } else {
-                console.info('not found...');
-            }
-        });
-    },
-
+    /*
     start: function (req, res) {
         // Make sure this is a socket request (not traditional HTTP)
         if (!req.isSocket) {
@@ -55,4 +24,5 @@ module.exports = {
             message: "OK"
         });
     }
+    */
 };
