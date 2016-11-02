@@ -1,5 +1,3 @@
-"use strict";
-
 (function(w, d){
     var username = w.localStorage.getItem('username');
 
