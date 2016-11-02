@@ -49,4 +49,13 @@ module.exports.policies = {
         // feed : ['isNiceToAnimals', 'hasRabbitFood']
 
     // }
+
+    /**
+     * Enable only user retrieval from API.
+     */
+    UserController: {
+        'find': true,
+        'findOne': true,
+        '*': false
+    },
 };
