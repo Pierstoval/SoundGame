@@ -1,4 +1,9 @@
 module.exports = {
+
+    start: function(req, res) {
+        return res.view('front/game/start');
+    }
+
     /*
     start: function (req, res) {
         // Make sure this is a socket request (not traditional HTTP)
