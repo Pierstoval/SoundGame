@@ -1,3 +1,5 @@
+
+var bcrypt = require('bcrypt');
 var uuid = require('node-uuid');
 
 module.exports = {
@@ -25,17 +27,43 @@ module.exports = {
         },
 
         email: {
-            type: 'string',
+            type: 'email',
             required: true,
             notNull: true,
             unique: true,
             email: true
         },
 
-        game: {
-            model: 'game'
+        password: {
+            type: 'string',
+            minLength: 6,
+            required: true
+        },
+
+        picks: {
+            collection: 'pick',
+            via: 'user'
+        },
+
+        toJSON: function() {
+            var obj = this.toObject();
+            delete obj.password;
+            return obj;
         }
 
-    }
+    },
 
+    beforeCreate: function(user, cb) {
+        bcrypt.genSalt(10, function(err, salt) {
+            bcrypt.hash(user.password, salt, function(err, hash) {
+                if (err) {
+                    console.log(err);
+                    cb(err);
+                } else {
+                    user.password = hash;
+                    cb();
+                }
+            });
+        });
+    }
 };
