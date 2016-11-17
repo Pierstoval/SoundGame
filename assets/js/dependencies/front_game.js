@@ -1,4 +1,4 @@
-(function(w, d){
+/*(function(w, d){
     var username = w.localStorage.getItem('username');
 
     // Validate username.
@@ -34,3 +34,4 @@
     });
 
 })(window, window.document);
+*/
