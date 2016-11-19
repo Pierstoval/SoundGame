@@ -26,10 +26,6 @@ module.exports.policies = {
      *                                                                          *
      ***************************************************************************/
 
-    '*': false,
-
-    'GameController': {
-        '*': 'isAuthenticated'
-    }
+    '*': true,
 
 };
