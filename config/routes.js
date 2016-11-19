@@ -33,4 +33,7 @@ module.exports.routes = {
 
     // Game
     'get /game/start': 'GameController.start',
+
+    // Socket methods
+    'post /s/register_home': 'SocketController.registerHome',
 };
