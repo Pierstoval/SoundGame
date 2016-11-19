@@ -1,6 +1,15 @@
+
 module.exports = {
 
     tickInterval: 1000,
+
+    // These vars allow us to know how many ticks we executed
+    maxInt: MAX_INT = Math.pow(2, 53),
+    tickNumber: 0,
+    tickInfinityCalls: 0,
+
+    // If one tick is longer than the others, this prevents any concurrent tick
+    ticking: false,
 
     timeout: null,
 
