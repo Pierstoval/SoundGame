@@ -14,6 +14,7 @@ module.exports = {
     timeout: null,
 
     startLoop: function(){
+        this.tick();
         this.timeout = setInterval(this.tick, this.tickInterval);
     },
 
@@ -22,7 +23,25 @@ module.exports = {
     },
 
     tick: function(){
-        console.info('Ticking');
-        console.info('Sockets : ', sails.sockets.subscribers());
+
+        if (this.ticking) {
+            return;
+        }
+
+        this.ticking = true;
+
+        // Count number of occurrences for the Tick
+        this.tickNumber++;
+
+        if (this.tickNumber === this.MAX_INT) {
+            this.tickNumber = 0;
+            this.tickInfinityCalls++;
+        }
+
+        console.info(new Date, 'Tick '+this.tickInfinityCalls+'-'+this.tickNumber);
+
+        sails.sockets.broadcast('home', 'home', {'message':'Ticking hello message.'});
+
+        this.ticking = false;
     }
 };
