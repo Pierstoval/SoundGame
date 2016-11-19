@@ -18,12 +18,12 @@ module.exports = {
             }
         },
 
-        name: {
+        username: {
             type: 'string',
             required: true,
             notNull: true,
             unique: true,
-            alphanumericdashed: true
+            minLength: 5
         },
 
         email: {
@@ -65,5 +65,16 @@ module.exports = {
                 }
             });
         });
+    }
+};
+module.exports = {
+    attributes: {
+        firstName:    'STRING',
+        lastName:     'STRING',
+        age:          { type: 'INTEGER', max: 150, required: true },
+        birthDate:    'DATE',
+        phoneNumber:  { type: 'STRING', defaultsTo: '111-222-3333' },
+        emailAddress: { type: 'email', required: true },
+        pseudo:       { type: 'string', maxLength: 20, minLength: 5 }
     }
 };
