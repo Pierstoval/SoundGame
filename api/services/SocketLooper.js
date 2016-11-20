@@ -1,47 +1,87 @@
-
+/**
+ * Loop that will be used to synchronize every users with the game engine.
+ * To save a bit of memory, loop is disabled when there is no user connected to the game.
+ */
 module.exports = {
 
-    tickInterval: 1000,
+    // In milliseconds (but won't be "live" milliseconds actually)
+    tickInterval: 500,
 
-    // These vars allow us to know how many ticks we executed
-    maxInt: MAX_INT = Math.pow(2, 53),
-    tickNumber: 0,
-    tickInfinityCalls: 0,
+    // This var allows us to know how many ticks we executed
+    // On a 64 bits system, it can go up to thousands of years...
+    numberOfTicks: 0,
 
     // If one tick is longer than the others, this prevents any concurrent tick
     ticking: false,
 
-    timeout: null,
+    interval: null,
+
+    lastSecond: null,
+    lastSecondTicks: null,
+
+    init: function(){
+        this.startLoop();
+    },
 
     startLoop: function(){
         this.tick();
-        this.timeout = setInterval(this.tick, this.tickInterval);
+        this.interval = setInterval(this.tick, this.tickInterval);
     },
 
     stopLoop: function(){
-        clearInterval(this.timeout);
+        clearInterval(this.interval);
+        this.interval = null;
+    },
+
+    /**
+     * This method is called in GameUsers.js every time a user is added or removed.
+     */
+    revalidateStatus: function(){
+        let numberOfUsers = Object.keys(GameUsers.users).length;
+
+        console.info('Revalidating status with users: '+numberOfUsers);
+
+        // Lighten memory by disabling loops if there is no user connected to the game.
+        if (0 === numberOfUsers) {
+            SocketLooper.stopLoop();
+        } else if (!SocketLooper.interval) {
+            SocketLooper.startLoop();
+        }
     },
 
     tick: function(){
 
+        this.checkSeconds();
+
         if (this.ticking) {
-            return;
+            // return;
         }
 
         this.ticking = true;
 
         // Count number of occurrences for the Tick
-        this.tickNumber++;
+        this.numberOfTicks++;
 
-        if (this.tickNumber === this.MAX_INT) {
-            this.tickNumber = 0;
-            this.tickInfinityCalls++;
-        }
-
-        console.info(new Date, 'Tick '+this.tickInfinityCalls+'-'+this.tickNumber);
-
-        sails.sockets.broadcast('home', 'home', {'message':'Ticking hello message.'});
+        GameUsers.refresh();
 
         this.ticking = false;
+    },
+
+    // Allow us to debug
+    checkSeconds: function(){
+        var d = new Date(),
+            second = d.getSeconds();
+
+        if (null === this.lastSecond) {
+            this.lastSecond = second;
+            this.lastSecondTicks = this.numberOfTicks;
+            return;
+        }
+
+        if (this.lastSecond !== second) {
+            console.info('Executed '+(this.numberOfTicks-this.lastSecondTicks)+' ticks last second.');
+            this.lastSecond = second;
+            this.lastSecondTicks = this.numberOfTicks;
+        }
     }
 };

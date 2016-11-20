@@ -12,7 +12,6 @@
 
 module.exports.sockets = {
 
-
     /***************************************************************************
      *                                                                          *
      * Node.js (and consequently Sails.js) apps scale horizontally. It's a      *
@@ -50,7 +49,6 @@ module.exports.sockets = {
     // db: 0,
     // pass: '<redis auth password>',
 
-
     /***************************************************************************
      *                                                                          *
      * Whether to expose a 'get /__getcookie' route with CORS support that sets *
@@ -65,7 +63,6 @@ module.exports.sockets = {
      ***************************************************************************/
 
     // grant3rdPartyCookie: true,
-
 
     /***************************************************************************
      *                                                                          *
@@ -111,7 +108,6 @@ module.exports.sockets = {
     //   // (`false` would reject the connection)
     // },
 
-
     /***************************************************************************
      *                                                                          *
      * `afterDisconnect`                                                        *
@@ -120,10 +116,11 @@ module.exports.sockets = {
      * disconnects                                                              *
      *                                                                          *
      ***************************************************************************/
-    // afterDisconnect: function(session, socket, cb) {
-    //   // By default: do nothing.
-    //   return cb();
-    // },
+    afterDisconnect: function (session, socket, cb) {
+        GameUsers.removeUserBySocketId(socket.id);
+
+        return cb();
+    },
 
     /***************************************************************************
      *                                                                          *
