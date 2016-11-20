@@ -6,10 +6,17 @@
  */
 
 module.exports = {
+
+    // Used for testing, at first
     registerHome: function(req, res) {
+        if (!req.isSocket) {
+            return res.badRequest();
+        }
+
         sails.sockets.join(req, 'home');
 
         return res.ok();
     }
+
 };
 
