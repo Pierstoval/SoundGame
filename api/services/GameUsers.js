@@ -14,21 +14,9 @@ module.exports = {
 
         sails.sockets.join(req, 'game');
 
-        User.create({
-            socket_id: req.socket.id
-        }).exec(function (err, user){
-            if (err) {
-                sails.log.error('Could not save user :(', err);
+        _this.users[req.socket.id] = req.socket;
 
-                return;
-            }
-
-            console.info('Added user', user);
-
-            _this.users[req.socket.id] = user;
-
-            SocketLooper.revalidateStatus();
-        });
+        SocketLooper.revalidateStatus();
     },
 
     /**
@@ -40,19 +28,9 @@ module.exports = {
 
         sails.sockets.leave(this.users[id], 'game');
 
-        User.destroy(this.users[id]).exec(function(err, user){
-            if (err) {
-                sails.log.error('Could not destroy user :(', err);
+        delete _this.users[id];
 
-                return;
-            }
-
-            console.info('Destroying user', user);
-
-            delete _this.users[id];
-
-            SocketLooper.revalidateStatus();
-        });
+        SocketLooper.revalidateStatus();
     },
 
     refresh: function () {

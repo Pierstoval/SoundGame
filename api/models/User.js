@@ -40,11 +40,6 @@ module.exports = {
             via: 'user'
         },
 
-        socket_id: {
-            type: 'string',
-            unique: true
-        },
-
         toJSON: function() {
             var obj = this.toObject();
             delete obj.password;
