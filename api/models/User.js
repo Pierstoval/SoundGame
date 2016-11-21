@@ -20,29 +20,29 @@ module.exports = {
 
         username: {
             type: 'string',
-            required: true,
-            notNull: true,
             unique: true,
             minLength: 5
         },
 
         email: {
             type: 'email',
-            required: true,
-            notNull: true,
             unique: true,
             email: true
         },
 
         password: {
             type: 'string',
-            minLength: 6,
-            required: true
+            minLength: 6
         },
 
         picks: {
             collection: 'pick',
             via: 'user'
+        },
+
+        socket_id: {
+            type: 'string',
+            unique: true
         },
 
         toJSON: function() {
@@ -54,6 +54,10 @@ module.exports = {
     },
 
     beforeCreate: function(user, cb) {
+        // Only hash the password when the user enters one
+        if (!user.password) {
+            return;
+        }
         bcrypt.genSalt(10, function(err, salt) {
             bcrypt.hash(user.password, salt, function(err, hash) {
                 if (err) {
@@ -65,16 +69,5 @@ module.exports = {
                 }
             });
         });
-    }
-};
-module.exports = {
-    attributes: {
-        firstName:    'STRING',
-        lastName:     'STRING',
-        age:          { type: 'INTEGER', max: 150, required: true },
-        birthDate:    'DATE',
-        phoneNumber:  { type: 'STRING', defaultsTo: '111-222-3333' },
-        emailAddress: { type: 'email', required: true },
-        pseudo:       { type: 'string', maxLength: 20, minLength: 5 }
     }
 };
