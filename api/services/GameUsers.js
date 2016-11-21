@@ -10,11 +10,25 @@ module.exports = {
      * Executed in the GameController.socketRegister route action.
      */
     addUserFromSocketRequest: function (req) {
+        var _this = this;
+
         sails.sockets.join(req, 'game');
 
-        this.users[req.socket.id] = req.socket;
+        User.create({
+            socket_id: req.socket.id
+        }).exec(function (err, user){
+            if (err) {
+                sails.log.error('Could not save user :(', err);
 
-        SocketLooper.revalidateStatus();
+                return;
+            }
+
+            console.info('Added user', user);
+
+            _this.users[req.socket.id] = user;
+
+            SocketLooper.revalidateStatus();
+        });
     },
 
     /**
@@ -22,14 +36,27 @@ module.exports = {
      * Can also be executed manually in GameController.socketDisconnect route action.
      */
     removeUserBySocketId: function (id) {
+        var _this = this;
+
         sails.sockets.leave(this.users[id], 'game');
 
-        delete this.users[id];
+        User.destroy(this.users[id]).exec(function(err, user){
+            if (err) {
+                sails.log.error('Could not destroy user :(', err);
 
-        SocketLooper.revalidateStatus();
+                return;
+            }
+
+            console.info('Destroying user', user);
+
+            delete _this.users[id];
+
+            SocketLooper.revalidateStatus();
+        });
     },
 
     refresh: function () {
+
         for (let id in this.users) {
             if (!this.users.hasOwnProperty(id)) {
                 continue;
