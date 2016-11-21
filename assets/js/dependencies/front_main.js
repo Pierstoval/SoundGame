@@ -1,5 +1,6 @@
 (function(w, d, io){
 
+    /*
     io.socket.post('/s/register_home', {}, function(body, response) {
         if (200 !== response.statusCode) {
             console.log('Server responded with status code ' + response.statusCode + ' and data: ', body);
@@ -29,5 +30,6 @@
         io.socket.on('home', console.info);
         io.socket.on('hello', console.info);
     });
+    */
 
 })(window, window.document, io);
