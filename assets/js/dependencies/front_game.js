@@ -5,16 +5,20 @@
         return;
     }
 
-    io.socket.post('/s/game/register', {}, function(body, response) {
+    var canvas = d.querySelector('canvas#game');
+    var context = canvas.getContext('2d');
+
+    io.socket.post('/s/game/register', {
+        width: canvas.width,
+        height: canvas.height
+    }, function(body, response) {
         if (200 !== response.statusCode) {
             d.getElementById('game').innerHTML = body;
 
             return;
         }
-
-        var canvas = d.querySelector('canvas#game');
-        var context = canvas.getContext('2d');
-        var is_pressing = false; // Avoids sending key events all the time, saves memory
+        var is_pressing = {}; // Avoids sending key events all the time for the same key, saves memory
+        var circlePerimeter = 2 * Math.PI; // Avoids recalculating it on every request
 
         /**
          * Game sync.
@@ -38,7 +42,7 @@
             context.globalAlpha=1;
 
             context.beginPath();
-            context.arc(data.x + 50, data.y + 50, data.r, 0, 2 * Math.PI);
+            context.arc(data.x, data.y, data.r, 0, circlePerimeter);
             context.stroke();
 
             context.restore();
@@ -48,20 +52,20 @@
          * Key events to send via websocket
          */
         d.addEventListener('keydown', function(event){
-            if (is_pressing) {
-                // Avoids sending this event too often
+            if (is_pressing[event.keyCode]) {
+                // Avoids sending this event too often for the same key
+                // (and avoids some hack too, even if we're clien-side here...)
                 return false;
             }
 
-            is_pressing = true;
+            is_pressing[event.keyCode] = true;
 
             io.socket.post('/s/game/keydown', {
                 key_code: event.keyCode
             });
         });
         d.addEventListener('keyup', function(event){
-
-            is_pressing = false;
+            is_pressing[event.keyCode] = false;
 
             io.socket.post('/s/game/keyup', {
                 key_code: event.keyCode

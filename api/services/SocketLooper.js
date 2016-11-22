@@ -5,7 +5,7 @@
 module.exports = {
 
     // In milliseconds (but won't be "live" milliseconds actually)
-    tickInterval: 500,
+    tickInterval: 25,
 
     // This var allows us to know how many ticks we executed
     // On a 64 bits system, it can go up to thousands of years...
@@ -34,12 +34,10 @@ module.exports = {
     },
 
     /**
-     * This method is called in GameUsers.js every time a user is added or removed.
+     * This method is called in GameEngine.js every time a user is added or removed.
      */
     revalidateStatus: function(){
-        let numberOfUsers = Object.keys(GameUsers.users).length;
-
-        console.info('Revalidating status with users: '+numberOfUsers);
+        let numberOfUsers = Object.keys(GameEngine.users).length;
 
         // Lighten memory by disabling loops if there is no user connected to the game.
         if (0 === numberOfUsers) {
@@ -62,7 +60,7 @@ module.exports = {
         // Count number of occurrences for the Tick
         this.numberOfTicks++;
 
-        GameUsers.refresh();
+        GameEngine.refresh();
 
         this.ticking = false;
     },
@@ -79,7 +77,7 @@ module.exports = {
         }
 
         if (this.lastSecond !== second) {
-            console.info('Executed '+(this.numberOfTicks-this.lastSecondTicks)+' ticks last second.');
+            // console.info('Executed '+(this.numberOfTicks-this.lastSecondTicks)+' ticks last second.');
             this.lastSecond = second;
             this.lastSecondTicks = this.numberOfTicks;
         }

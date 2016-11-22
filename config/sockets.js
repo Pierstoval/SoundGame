@@ -117,7 +117,7 @@ module.exports.sockets = {
      *                                                                          *
      ***************************************************************************/
     afterDisconnect: function (session, socket, cb) {
-        GameUsers.removeUserBySocketId(socket.id);
+        GameEngine.removeUserBySocketId(socket.id);
 
         return cb();
     },
