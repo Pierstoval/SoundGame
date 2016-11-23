@@ -1,4 +1,3 @@
-const PI = parseFloat(Math.PI.toFixed(10));
 
 module.exports = {
 
@@ -26,9 +25,9 @@ module.exports = {
             pick:      {
                 x:          0,
                 y:          0,
-                r:          10,
-                angle:      0, // In degree
-                speed:      2,
+                r:          2,
+                angle:      180, // In degree
+                speed:      4,
                 angleSpeed: 10, // In degree too
             },
             map:       {
@@ -45,6 +44,7 @@ module.exports = {
         };
 
         SocketLooper.revalidateStatus();
+        this.refresh();
     },
 
     /**
@@ -76,7 +76,7 @@ module.exports = {
 
             let data = Serializer.serializeUser(user);
 
-            let propertiesToCheck = ['x', 'y', 'r'];
+            let propertiesToCheck = ['x', 'y', 'r', 'a'];
 
             if (
                 !this.lastData[id]
@@ -131,47 +131,43 @@ module.exports = {
 
         // Handle angle & rotation direction system
 
-        // Change angle if "left" or "right" is pushed
-        if (moves.left || moves.right) {
-            console.info(PI);
+    // Change angle if "left" or "right" is pushed
+    if (moves.left || moves.right) {
+        // let PI2 = 2 * PI;
+        let angle = user.pick.angle;
 
-            // let PI2 = 2 * PI;
-            let angle = user.pick.angle;
-
-            if (moves.left) {
-                angle += user.pick.angleSpeed;
-            } else if (moves.right) {
-                angle -= user.pick.angleSpeed;
-            }
-
-            // Use this to avoid having huge integers to manage
-            // if (angle < 0) {
-            //     angle = 360 - angle;
-            // }
-            // if (angle > 360) {
-            //     angle = angle - 360;
-            // }
-
-            user.pick.angle = parseInt(angle);
+        if (moves.left) {
+            angle += user.pick.angleSpeed;
+        } else if (moves.right) {
+            angle -= user.pick.angleSpeed;
         }
 
-        // Up and down allow us to move either forwards or backwards.
-        if (moves.up || moves.down) {
-
-            let moveRatio = moves.up ? 1 : -1;
-
-            let angleRadians = user.pick.angle * (PI / 180);
-            let x = user.pick.x + moveRatio * user.pick.speed * Math.sin(angleRadians);
-            let y = user.pick.y + moveRatio * user.pick.speed * Math.cos(angleRadians);
-
-            // Avoids collisions with canvas walls
-            if (x > 0 && x < user.map.width) {
-                user.pick.x = parseInt(x);
-            }
-            if (y > 0 && y < user.map.height) {
-                user.pick.y = parseInt(y);
-            }
+        // Use this to avoid having huge integers to manage
+        if (angle <= 0 || angle >= 360) {
+            angle %= 360;
         }
+
+        user.pick.angle = parseInt(angle);
+    }
+
+    // Up and down allow us to move either forwards or backwards.
+    if (moves.up || moves.down) {
+
+        let moveRatio = moves.up ? 1 : -1;
+
+        let angleRadians = user.pick.angle * (Math.PI / 180);
+
+        let x = user.pick.x + moveRatio * user.pick.speed * Math.sin(angleRadians);
+        let y = user.pick.y + moveRatio * user.pick.speed * Math.cos(angleRadians);
+
+        // Avoids collisions with canvas walls
+        if (x > 0 && x < user.map.width) {
+            user.pick.x = Math.round(x);
+        }
+        if (y > 0 && y < user.map.height) {
+            user.pick.y = Math.round(y);
+        }
+    }
 
     }
 };

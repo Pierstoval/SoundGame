@@ -30,6 +30,7 @@
             var x = data.x;
             var y = data.y;
             var r = data.r;
+            var angle = data.a;
 
             if (isNaN(x) || isNaN(y) || isNaN(r)) {
                 return;
@@ -43,6 +44,15 @@
 
             context.beginPath();
             context.arc(data.x, data.y, data.r, 0, circlePerimeter);
+            context.stroke();
+
+            var angleRadians = angle * (Math.PI / 180);
+            var nextPointX = x + 4 * data.s * Math.sin(angleRadians);
+            var nextPointY = y + 4 * data.s * Math.cos(angleRadians);
+
+            context.beginPath();
+            context.moveTo(data.x, data.y);
+            context.lineTo(nextPointX, nextPointY);
             context.stroke();
 
             context.restore();

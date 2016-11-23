@@ -52,7 +52,7 @@ module.exports = {
         this.checkSeconds();
 
         if (this.ticking) {
-            // return;
+            return;
         }
 
         this.ticking = true;
