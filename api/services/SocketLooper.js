@@ -5,7 +5,7 @@
 module.exports = {
 
     // In milliseconds (but won't be "live" milliseconds actually)
-    tickInterval: 25,
+    tickInterval: 10,
 
     // This var allows us to know how many ticks we executed
     // On a 64 bits system, it can go up to thousands of years...

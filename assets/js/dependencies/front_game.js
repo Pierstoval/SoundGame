@@ -6,6 +6,15 @@
     }
 
     var canvas = d.querySelector('canvas#game');
+    canvas.width = w.innerWidth - 20;
+    canvas.height = w.innerHeight - 20;
+    canvas.style.width = canvas.width;
+    canvas.style.height = canvas.height;
+    canvas.style.position = 'absolute';
+    canvas.style.top = '50%';
+    canvas.style.left = '50%';
+    canvas.style.marginLeft = '-'+Math.round(canvas.width/2)+'px';
+    canvas.style.marginTop = '-'+Math.round(canvas.height/2)+'px';
     var context = canvas.getContext('2d');
 
     io.socket.post('/s/game/register', {

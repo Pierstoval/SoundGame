@@ -18,6 +18,9 @@ module.exports = {
      * Executed in the GameController.socketRegister route action.
      */
     addUserFromSocketRequest: function (req) {
+        let width = req.param('width');
+        let height = req.param('height');
+
         sails.sockets.join(req, 'game');
 
         this.users[req.socket.id] = {
@@ -28,7 +31,7 @@ module.exports = {
                 r:          2,
                 angle:      180, // In degree
                 speed:      4,
-                angleSpeed: 10, // In degree too
+                angleSpeed: 4, // In degree too
             },
             map:       {
                 width:  req.param('width') || 100,
