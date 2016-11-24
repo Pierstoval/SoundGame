@@ -1,4 +1,3 @@
-
 module.exports = {
 
     /**
@@ -18,36 +17,65 @@ module.exports = {
      * Executed in the GameController.socketRegister route action.
      */
     addUserFromSocketRequest: function (req) {
-        let width = req.param('width');
-        let height = req.param('height');
+        let mapWidth  = 500;
+        let mapHeight = 500;
 
         sails.sockets.join(req, 'game');
 
         this.users[req.socket.id] = {
-            id:        null,
-            pick:      {
-                x:          0,
-                y:          0,
-                r:          2,
+            id:         null,
+            playSounds: [],
+            pick:       {
+                x:          Math.round(mapWidth / 2),
+                y:          Math.round(mapHeight / 2),
+                radius:     2,
                 angle:      180, // In degree
-                speed:      4,
-                angleSpeed: 4, // In degree too
+                speed:      Math.round(mapWidth / (25 * SocketLooper.tickInterval)), // Speed must be proportional to the canvas size
+                angleSpeed: 4, // In degree
+                imageUrl:   '/images/guitar-pick.gif',
             },
-            map:       {
-                width:  req.param('width') || 100,
-                height: req.param('height') || 100,
+            map:        {
+                width:  mapWidth,
+                height: mapHeight,
             },
-            movements: {
+            assets:     {
+                sounds: {
+                    '0a':  '/sounds/68437__pinkyfinger__piano-a.wav',
+                    '0b':  '/sounds/68438__pinkyfinger__piano-b.wav',
+                    '0bb': '/sounds/68439__pinkyfinger__piano-bb.wav',
+                    '0c':  '/sounds/68440__pinkyfinger__piano-c.wav',
+                    '0d':  '/sounds/68442__pinkyfinger__piano-d.wav',
+                    '0e':  '/sounds/68443__pinkyfinger__piano-e.wav',
+                    '0eb': '/sounds/68444__pinkyfinger__piano-eb.wav',
+                    '0f':  '/sounds/68445__pinkyfinger__piano-f.wav',
+                    '0g':  '/sounds/68447__pinkyfinger__piano-g.wav',
+                    '1c':  '/sounds/68441__pinkyfinger__piano-c.wav',
+                    '1f':  '/sounds/68446__pinkyfinger__piano-f.wav',
+                    '1g':  '/sounds/68448__pinkyfinger__piano-g.wav',
+                },
+            },
+            movements:  {
                 left:  false,
                 right: false,
                 up:    false,
                 down:  false,
             },
-            socket:    req.socket,
+            level:      {
+                notes: [
+                    {
+                        x:        Math.round(mapWidth / 3),
+                        y:        Math.round(mapWidth / 3),
+                        imageUrl: 'images/quaver.gif'
+                    }
+                ]
+            },
+            // socket:    req.socket,
         };
 
         SocketLooper.revalidateStatus();
         this.refresh();
+
+        return this.users[req.socket.id];
     },
 
     /**
@@ -77,19 +105,26 @@ module.exports = {
 
             this.applyMovement(user);
 
-            let data = Serializer.serializeUser(user);
+            let data = Serializer.serializeDataFromUser(user);
 
-            let propertiesToCheck = ['x', 'y', 'r', 'a'];
+            // TODO: Add data.snd.push() for each collision with a note.
 
             if (
-                !this.lastData[id]
+                !user.id
+                || !this.lastData[id]
                 || (
                     this.lastData[id]
-                    && RedrawDiffChecker.testDiff(data, this.lastData[id], propertiesToCheck)
+                    && !RedrawDiffChecker.simpleEqual(data, this.lastData[id])
                 )
             ) {
-                console.info(JSON.stringify(user.pick));
+                console.info(JSON.stringify(user));
                 sails.sockets.broadcast(id, 'game', data);
+                if (!user.id) {
+                    user.id = id;
+                }
+                if (user.playSounds.length) {
+                    user.playSounds = [];
+                }
             }
 
             this.lastData[id] = data;
@@ -134,43 +169,43 @@ module.exports = {
 
         // Handle angle & rotation direction system
 
-    // Change angle if "left" or "right" is pushed
-    if (moves.left || moves.right) {
-        // let PI2 = 2 * PI;
-        let angle = user.pick.angle;
+        // Change angle if "left" or "right" is pushed
+        if (moves.left || moves.right) {
+            // let PI2 = 2 * PI;
+            let angle = user.pick.angle;
 
-        if (moves.left) {
-            angle += user.pick.angleSpeed;
-        } else if (moves.right) {
-            angle -= user.pick.angleSpeed;
+            if (moves.left) {
+                angle += user.pick.angleSpeed;
+            } else if (moves.right) {
+                angle -= user.pick.angleSpeed;
+            }
+
+            // Use this to avoid having huge integers to manage
+            if (angle <= 0 || angle >= 360) {
+                angle %= 360;
+            }
+
+            user.pick.angle = parseInt(angle);
         }
 
-        // Use this to avoid having huge integers to manage
-        if (angle <= 0 || angle >= 360) {
-            angle %= 360;
+        // Up and down allow us to move either forwards or backwards.
+        if (moves.up || moves.down) {
+
+            let moveRatio = moves.up ? 1 : -1;
+
+            let angleRadians = user.pick.angle * (Math.PI / 180);
+
+            let x = user.pick.x + moveRatio * user.pick.speed * Math.sin(angleRadians);
+            let y = user.pick.y + moveRatio * user.pick.speed * Math.cos(angleRadians);
+
+            // Avoids collisions with canvas walls
+            if (x > 0 && x < user.map.width) {
+                user.pick.x = Math.round(x);
+            }
+            if (y > 0 && y < user.map.height) {
+                user.pick.y = Math.round(y);
+            }
         }
-
-        user.pick.angle = parseInt(angle);
-    }
-
-    // Up and down allow us to move either forwards or backwards.
-    if (moves.up || moves.down) {
-
-        let moveRatio = moves.up ? 1 : -1;
-
-        let angleRadians = user.pick.angle * (Math.PI / 180);
-
-        let x = user.pick.x + moveRatio * user.pick.speed * Math.sin(angleRadians);
-        let y = user.pick.y + moveRatio * user.pick.speed * Math.cos(angleRadians);
-
-        // Avoids collisions with canvas walls
-        if (x > 0 && x < user.map.width) {
-            user.pick.x = Math.round(x);
-        }
-        if (y > 0 && y < user.map.height) {
-            user.pick.y = Math.round(y);
-        }
-    }
 
     }
 };
