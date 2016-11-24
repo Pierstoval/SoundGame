@@ -12,9 +12,9 @@ module.exports = {
             return res.badRequest();
         }
 
-        GameEngine.addUserFromSocketRequest(req);
+        let user = GameEngine.addUserFromSocketRequest(req);
 
-        return res.ok();
+        return res.ok(user);
     },
 
     socketDisconnect: function (req, res) {
