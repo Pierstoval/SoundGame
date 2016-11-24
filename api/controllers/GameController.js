@@ -17,6 +17,24 @@ module.exports = {
         return res.ok(user);
     },
 
+    socketSetRendered: function (req, res) {
+        if (!req.isSocket) {
+            return res.badRequest();
+        }
+
+        let socketId = req.socket.id;
+
+        if (!GameEngine.users[socketId]) {
+            let msg = 'Invalid socket id for setRendered action';
+            sails.log.warn(msg);
+            return res.status(500).send(msg);
+        }
+
+        GameEngine.users[socketId].rendered = true;
+
+        return res.ok();
+    },
+
     socketDisconnect: function (req, res) {
         if (!req.isSocket) {
             return res.badRequest();
@@ -35,8 +53,9 @@ module.exports = {
         let socketId = req.socket.id;
 
         if (!GameEngine.users[socketId]) {
-            sails.log.warn('Invalid socket id for keyUp action');
-            return;
+            let msg = 'Invalid socket id for keyDown action';
+            sails.log.warn(msg);
+            return res.status(500).send(msg);
         }
 
         let keyCode = req.param('key_code');
@@ -58,8 +77,9 @@ module.exports = {
         let socketId = req.socket.id;
 
         if (!GameEngine.users[socketId]) {
-            sails.log.warn('Invalid socket id for keyUp action');
-            return;
+            let msg = 'Invalid socket id for keyUp action';
+            sails.log.warn(msg);
+            return res.status(500).send(msg);
         }
 
         // Stop movement on key up
@@ -76,5 +96,9 @@ module.exports = {
 
     start: function (req, res) {
         return res.view('front/game/start');
-    }
+    },
+
+    game: function (req, res) {
+        return res.view('front/game/game');
+    },
 };

@@ -1,6 +1,7 @@
 /**
  * Loop that will be used to synchronize every users with the game engine.
  * To save a bit of memory, loop is disabled when there is no user connected to the game.
+ * @namespace SocketLooper
  */
 module.exports = {
 
@@ -41,9 +42,9 @@ module.exports = {
 
         // Lighten memory by disabling loops if there is no user connected to the game.
         if (0 === numberOfUsers) {
-            SocketLooper.stopLoop();
-        } else if (!SocketLooper.interval) {
-            SocketLooper.startLoop();
+            this.stopLoop();
+        } else if (!this.interval) {
+            this.startLoop();
         }
     },
 
@@ -60,7 +61,7 @@ module.exports = {
         // Count number of occurrences for the Tick
         this.numberOfTicks++;
 
-        GameEngine.refresh();
+        GameEngine.refreshClients();
 
         this.ticking = false;
     },

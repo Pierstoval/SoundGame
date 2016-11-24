@@ -1,9 +1,13 @@
+/**
+ * @namespace Serializer
+ */
 module.exports = {
     /**
      * This corresponds to the data sent to the client.
      * Serialization this way is good to have the less possible amount of data.
      *
      * @param user
+     * @this Serializer
      */
     serializeDataFromUser: function (user) {
         return {
@@ -14,7 +18,7 @@ module.exports = {
             s: user.pick.speed,
             i: user.pick.imageUrl,
             n: this.serializeNotesArray(user.level.notes),
-            snd: user.playSounds,
+            snd: user.soundsToPlay,
         };
     },
 

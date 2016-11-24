@@ -1,3 +1,6 @@
+/**
+ * @namespace GameEngine
+ */
 module.exports = {
 
     /**
@@ -20,62 +23,73 @@ module.exports = {
         let mapWidth  = 500;
         let mapHeight = 500;
 
-        sails.sockets.join(req, 'game');
-
-        this.users[req.socket.id] = {
-            id:         null,
-            playSounds: [],
-            pick:       {
-                x:          Math.round(mapWidth / 2),
-                y:          Math.round(mapHeight / 2),
-                radius:     2,
-                angle:      180, // In degree
-                speed:      Math.round(mapWidth / (25 * SocketLooper.tickInterval)), // Speed must be proportional to the canvas size
-                angleSpeed: 4, // In degree
-                imageUrl:   '/images/guitar-pick.gif',
-            },
-            map:        {
+        let user = {
+            id:               req.socket.id,
+            rendered:         false,
+            soundsToPlay:     [],
+            pick:             new Models.Pick(
+                25,// Math.round(mapWidth / 2),
+                Math.round(mapHeight / 2),
+                2,
+                90, // In degree
+                1,
+                4, // In degree
+                '/images/guitar-pick.gif'
+            ),
+            map:              {
                 width:  mapWidth,
                 height: mapHeight,
             },
-            assets:     {
+            assets:           {
                 sounds: {
-                    '0a':  '/sounds/68437__pinkyfinger__piano-a.wav',
-                    '0b':  '/sounds/68438__pinkyfinger__piano-b.wav',
-                    '0bb': '/sounds/68439__pinkyfinger__piano-bb.wav',
-                    '0c':  '/sounds/68440__pinkyfinger__piano-c.wav',
-                    '0d':  '/sounds/68442__pinkyfinger__piano-d.wav',
-                    '0e':  '/sounds/68443__pinkyfinger__piano-e.wav',
-                    '0eb': '/sounds/68444__pinkyfinger__piano-eb.wav',
-                    '0f':  '/sounds/68445__pinkyfinger__piano-f.wav',
-                    '0g':  '/sounds/68447__pinkyfinger__piano-g.wav',
-                    '1c':  '/sounds/68441__pinkyfinger__piano-c.wav',
-                    '1f':  '/sounds/68446__pinkyfinger__piano-f.wav',
-                    '1g':  '/sounds/68448__pinkyfinger__piano-g.wav',
+                    '0Sol#':  '/sounds/68447__pinkyfinger__piano-g.wav',
+                    '1La':  '/sounds/68437__pinkyfinger__piano-a.wav',
+                    '1Sib': '/sounds/68439__pinkyfinger__piano-bb.wav',
+                    '1Si':  '/sounds/68438__pinkyfinger__piano-b.wav',
+                    '1Do':  '/sounds/68441__pinkyfinger__piano-c.wav',
+                    '1Re#':  '/sounds/68440__pinkyfinger__piano-c.wav',
+                    '1Re':  '/sounds/68442__pinkyfinger__piano-d.wav',
+                    '1Mib': '/sounds/68444__pinkyfinger__piano-eb.wav',
+                    '1Mi':  '/sounds/68443__pinkyfinger__piano-e.wav',
+                    '1Fab':  '/sounds/68446__pinkyfinger__piano-f.wav',
+                    '1Fa':  '/sounds/68445__pinkyfinger__piano-f.wav',
+                    '1Sol':  '/sounds/68448__pinkyfinger__piano-g.wav',
                 },
             },
-            movements:  {
+            movements:        {
                 left:  false,
                 right: false,
                 up:    false,
                 down:  false,
             },
-            level:      {
-                notes: [
-                    {
-                        x:        Math.round(mapWidth / 3),
-                        y:        Math.round(mapWidth / 3),
-                        imageUrl: 'images/quaver.gif'
-                    }
-                ]
+            level:            {
+                notes: []
             },
-            // socket:    req.socket,
+            collidingObjects: {},
         };
 
-        SocketLooper.revalidateStatus();
-        this.refresh();
+        // Add notes
+        let coords = 100;
+        user.level.notes.push(new Models.Note( 50+50, Math.round(mapHeight / 2), 'images/quaver.gif', 10, 20, new Models.SoundEvent('1Do', 0)));
+        user.level.notes.push(new Models.Note( 75+50, Math.round(mapHeight / 2), 'images/quaver.gif', 10, 20, new Models.SoundEvent('1Do', 0)));
+        user.level.notes.push(new Models.Note(100+50, Math.round(mapHeight / 2), 'images/quaver.gif', 10, 20, new Models.SoundEvent('1Do', 0)));
+        user.level.notes.push(new Models.Note(125+50, Math.round(mapHeight / 2), 'images/quaver.gif', 10, 20, new Models.SoundEvent('1Re', 0)));
+        user.level.notes.push(new Models.Note(150+50, Math.round(mapHeight / 2), 'images/quaver.gif', 10, 20, new Models.SoundEvent('1Mi', 0)));
+        user.level.notes.push(new Models.Note(200+50, Math.round(mapHeight / 2), 'images/quaver.gif', 10, 20, new Models.SoundEvent('1Re', 0)));
+        user.level.notes.push(new Models.Note(250+50, Math.round(mapHeight / 2), 'images/quaver.gif', 10, 20, new Models.SoundEvent('1Do', 0)));
+        user.level.notes.push(new Models.Note(275+50, Math.round(mapHeight / 2), 'images/quaver.gif', 10, 20, new Models.SoundEvent('1Mi', 0)));
+        user.level.notes.push(new Models.Note(300+50, Math.round(mapHeight / 2), 'images/quaver.gif', 10, 20, new Models.SoundEvent('1Re', 0)));
+        user.level.notes.push(new Models.Note(325+50, Math.round(mapHeight / 2), 'images/quaver.gif', 10, 20, new Models.SoundEvent('1Re', 0)));
+        user.level.notes.push(new Models.Note(350+50, Math.round(mapHeight / 2), 'images/quaver.gif', 10, 20, new Models.SoundEvent('1Do', 0)));
 
-        return this.users[req.socket.id];
+        this.users[req.socket.id] = user;
+
+        sails.sockets.join(req, 'game');
+
+        SocketLooper.revalidateStatus();
+        this.refreshClients();
+
+        return user;
     },
 
     /**
@@ -95,7 +109,7 @@ module.exports = {
         SocketLooper.revalidateStatus();
     },
 
-    refresh: function () {
+    refreshClients: function () {
 
         for (let id in this.users) {
             if (!this.users.hasOwnProperty(id)) {
@@ -107,23 +121,34 @@ module.exports = {
 
             let data = Serializer.serializeDataFromUser(user);
 
-            // TODO: Add data.snd.push() for each collision with a note.
-
             if (
-                !user.id
+                !user.rendered
                 || !this.lastData[id]
                 || (
                     this.lastData[id]
                     && !RedrawDiffChecker.simpleEqual(data, this.lastData[id])
                 )
             ) {
-                console.info(JSON.stringify(user));
-                sails.sockets.broadcast(id, 'game', data);
-                if (!user.id) {
-                    user.id = id;
+
+                // Test collisions ONLY if we moved
+                for (var i = 0, l = user.level.notes.length; i < l; i++) {
+                    let note            = user.level.notes[i];
+                    let collides        = CollisionsManager.testPickAndNoteCollide(user.pick, note);
+                    let alreadyCollides = user.collidingObjects[note.uuid];
+
+                    if (collides && !alreadyCollides) {
+                        data.snd.push(note.soundEvent);
+                        user.collidingObjects[note.uuid] = note;
+                    } else if (!collides && alreadyCollides) {
+                        delete user.collidingObjects[note.uuid];
+                    }
                 }
-                if (user.playSounds.length) {
-                    user.playSounds = [];
+
+                // console.info(JSON.stringify(user));
+                sails.sockets.broadcast(id, 'game', data);
+
+                if (user.soundsToPlay.length) {
+                    user.soundsToPlay = [];
                 }
             }
 
@@ -148,24 +173,6 @@ module.exports = {
             sails.log.error('Invalid user to apply movement to.');
             return;
         }
-
-        /*
-         // Handle classic directional direction system
-         let speed = user.speed;
-
-         if (moves.left && user.pick.x - 1 >= 0) {
-         user.pick.x -= speed;
-         }
-         if (moves.right && user.pick.x + 1 <= user.map.width) {
-         user.pick.x += speed;
-         }
-         if (moves.up && user.pick.y - 1 >= 0) {
-         user.pick.y -= speed;
-         }
-         if (moves.down && user.pick.y + 1 <= user.map.height) {
-         user.pick.y += speed;
-         }
-         */
 
         // Handle angle & rotation direction system
 

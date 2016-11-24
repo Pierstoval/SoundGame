@@ -23,7 +23,7 @@
 module.exports.routes = {
 
     // Home page
-    '/': { view: 'front/game/game' },
+    '/': 'GameController.game',
 
     // Authentication
     'get /register': { view: 'front/register' },
@@ -33,10 +33,12 @@ module.exports.routes = {
 
     // Game
     'get /game/start': 'GameController.start',
+    'get /game/game': 'GameController.game',
     'post /s/game/keydown': 'GameController.socketKeyDown',
     'post /s/game/keyup': 'GameController.socketKeyUp',
     'post /s/game/register': 'GameController.socketRegister',
     'post /s/game/disconnect': 'GameController.socketDisconnect',
+    'post /s/game/set_rendered': 'GameController.socketSetRendered',
 
     // Socket methods
     'post /s/register_home': 'SocketController.registerHome',
