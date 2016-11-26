@@ -1,7 +1,10 @@
 
-var bcrypt = require('bcrypt');
-var uuid = require('node-uuid');
+let bcrypt = require('bcrypt');
+let uuid = require('node-uuid');
 
+/**
+ * @namespace User
+ */
 module.exports = {
 
     attributes: {

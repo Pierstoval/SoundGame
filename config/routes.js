@@ -23,23 +23,23 @@
 module.exports.routes = {
 
     // Home page
-    '/': 'GameController.game',
+    '/': 'HomeController.index',
 
     // Authentication
-    'get /register': { view: 'front/register' },
-    'get /login':    { view: 'front/login' },
-    'post /login':   'AuthController.login',
-    '/logout':       'AuthController.logout',
+    'GET /register': { view: 'front/register' },
+    'GET /login':    { view: 'front/login' },
+    'POST /login':   'AuthController.login',
+    'GET /logout':       'AuthController.logout',
 
     // Game
-    'get /game/start': 'GameController.start',
-    'get /game/game': 'GameController.game',
-    'post /s/game/keydown': 'GameController.socketKeyDown',
-    'post /s/game/keyup': 'GameController.socketKeyUp',
-    'post /s/game/register': 'GameController.socketRegister',
-    'post /s/game/disconnect': 'GameController.socketDisconnect',
-    'post /s/game/set_rendered': 'GameController.socketSetRendered',
+    'GET /game/start': 'GameController.start',
+    'GET /game/game': 'GameController.game',
+    'POST /s/game/keydown': 'GameController.socketKeyDown',
+    'POST /s/game/keyup': 'GameController.socketKeyUp',
+    'POST /s/game/register': 'GameController.socketRegister',
+    'POST /s/game/disconnect': 'GameController.socketDisconnect',
+    'POST /s/game/set_rendered': 'GameController.socketSetRendered',
 
     // Socket methods
-    'post /s/register_home': 'SocketController.registerHome',
+    'POST /s/register_home': 'SocketController.registerHome',
 };
