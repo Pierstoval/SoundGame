@@ -1,6 +1,7 @@
 /**
  * Loop that will be used to synchronize every users with the game engine.
  * To save a bit of memory, loop is disabled when there is no user connected to the game.
+ *
  * @namespace SocketLooper
  */
 module.exports = {
@@ -20,6 +21,9 @@ module.exports = {
     lastSecond: null,
     lastSecondTicks: null,
 
+    /**
+     * Used to start the loop. Called in the "config/bootstrap.js" file
+     */
     init: function(){
         this.startLoop();
     },
