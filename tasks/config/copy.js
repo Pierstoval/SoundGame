@@ -19,26 +19,52 @@
  *   https://github.com/gruntjs/grunt-contrib-copy
  *
  */
-module.exports = function(grunt) {
+module.exports = function (grunt) {
 
-  grunt.config.set('copy', {
-    dev: {
-      files: [{
-        expand: true,
-        cwd: './assets',
-        src: ['**/*.!(coffee|less)'],
-        dest: '.tmp/public'
-      }]
-    },
-    build: {
-      files: [{
-        expand: true,
-        cwd: '.tmp/public',
-        src: ['**/*'],
-        dest: 'www'
-      }]
-    }
-  });
+    grunt.config.set('copy', {
+        dev:   {
+            files: [
+                {
+                    expand: true,
+                    cwd:    './assets',
+                    src:    ['**/*.!(coffee|less)'],
+                    dest:   '.tmp/public'
+                },
+                { // Materialize JS
+                    expand: true,
+                    cwd:    './node_modules/materialize-css/dist/js/',
+                    src:    ['materialize.min.js'],
+                    dest:   '.tmp/public/js/dependencies/'
+                },
+                { // Materialize Fonts
+                    expand: true,
+                    cwd:    './node_modules/materialize-css/dist/fonts/',
+                    src:    ['**'],
+                    dest:   '.tmp/public/fonts/'
+                },
+                { // Materialize CSS
+                    expand: true,
+                    cwd:    './node_modules/materialize-css/dist/css/',
+                    src:    ['materialize.min.css'],
+                    dest:   '.tmp/public/styles/'
+                },
+                { // jQuery
+                    expand: true,
+                    cwd:    './node_modules/jquery/dist/',
+                    src:    ['jquery.min.js'],
+                    dest:   '.tmp/public/js/dependencies/'
+                },
+            ]
+        },
+        build: {
+            files: [{
+                expand: true,
+                cwd:    '.tmp/public',
+                src:    ['**/*'],
+                dest:   'www'
+            }]
+        }
+    });
 
-  grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-contrib-copy');
 };
