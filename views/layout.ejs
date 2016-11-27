@@ -1,24 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title><%= typeof title == 'undefined' ? 'Orbitale SoundGame' : title %></title>
+    <title><%- blocks.title %></title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="shortcut icon" href="/favicon.ico">
 
     <!--STYLES-->
     <link rel="stylesheet" href="/styles/importer.css">
+    <link rel="stylesheet" href="/styles/materialize.min.css">
     <!--STYLES END-->
 </head>
 
 <body>
 
-<%- body %>
+<%- partial('front/partials/menu') %>
+
+<div class="container">
+
+    <%- body %>
+
+</div>
+
+<%- partial('front/partials/footer') %>
 
 <!--SCRIPTS-->
 <script src="/js/dependencies/sails.io.js"></script>
-<script src="/js/dependencies/front_game.js"></script>
-<script src="/js/dependencies/front_main.js"></script>
+<script src="/js/dependencies/jquery.min.js"></script>
+<script src="/js/dependencies/materialize.min.js"></script>
+<script src="/js/main.js"></script>
 <!--SCRIPTS END-->
+
+<%- blocks.javascripts %>
+
 </body>
 </html>

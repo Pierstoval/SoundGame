@@ -1,0 +1,17 @@
+
+<nav class="grey lighten-3 grey-text text-darken-1" role="navigation">
+    <div class="nav-wrapper container">
+        <a id="logo-container" href="/" class="brand-logo" title="Accueil">
+            <img src="/orbitale_logo.svg" alt="Orbitale logo">
+        </a>
+
+        <ul class="right hide-on-med-and-down">
+            <%- partial('./menu_items') %>
+        </ul>
+
+        <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
+        <ul id="nav-mobile" class="side-nav">
+            <%- partial('./menu_items') %>
+        </ul>
+    </div>
+</nav>
