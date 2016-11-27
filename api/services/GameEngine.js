@@ -70,17 +70,17 @@ module.exports = {
 
         // Add notes
         let coords = 100;
-        user.level.notes.push(new Models.Note( 50+50, Math.round(mapHeight / 2), 'images/quaver.gif', 10, 20, new Models.SoundEvent('1Do', 0)));
-        user.level.notes.push(new Models.Note( 75+50, Math.round(mapHeight / 2), 'images/quaver.gif', 10, 20, new Models.SoundEvent('1Do', 0)));
-        user.level.notes.push(new Models.Note(100+50, Math.round(mapHeight / 2), 'images/quaver.gif', 10, 20, new Models.SoundEvent('1Do', 0)));
-        user.level.notes.push(new Models.Note(125+50, Math.round(mapHeight / 2), 'images/quaver.gif', 10, 20, new Models.SoundEvent('1Re', 0)));
-        user.level.notes.push(new Models.Note(150+50, Math.round(mapHeight / 2), 'images/quaver.gif', 10, 20, new Models.SoundEvent('1Mi', 0)));
-        user.level.notes.push(new Models.Note(200+50, Math.round(mapHeight / 2), 'images/quaver.gif', 10, 20, new Models.SoundEvent('1Re', 0)));
-        user.level.notes.push(new Models.Note(250+50, Math.round(mapHeight / 2), 'images/quaver.gif', 10, 20, new Models.SoundEvent('1Do', 0)));
-        user.level.notes.push(new Models.Note(275+50, Math.round(mapHeight / 2), 'images/quaver.gif', 10, 20, new Models.SoundEvent('1Mi', 0)));
-        user.level.notes.push(new Models.Note(300+50, Math.round(mapHeight / 2), 'images/quaver.gif', 10, 20, new Models.SoundEvent('1Re', 0)));
-        user.level.notes.push(new Models.Note(325+50, Math.round(mapHeight / 2), 'images/quaver.gif', 10, 20, new Models.SoundEvent('1Re', 0)));
-        user.level.notes.push(new Models.Note(350+50, Math.round(mapHeight / 2), 'images/quaver.gif', 10, 20, new Models.SoundEvent('1Do', 0)));
+        user.level.notes.push(new Models.Note( 50+50, Math.round(mapHeight / 2), '/images/quaver.gif', 10, 20, new Models.SoundEvent('1Do', 0)));
+        user.level.notes.push(new Models.Note( 75+50, Math.round(mapHeight / 2), '/images/quaver.gif', 10, 20, new Models.SoundEvent('1Do', 0)));
+        user.level.notes.push(new Models.Note(100+50, Math.round(mapHeight / 2), '/images/quaver.gif', 10, 20, new Models.SoundEvent('1Do', 0)));
+        user.level.notes.push(new Models.Note(125+50, Math.round(mapHeight / 2), '/images/quaver.gif', 10, 20, new Models.SoundEvent('1Re', 0)));
+        user.level.notes.push(new Models.Note(150+50, Math.round(mapHeight / 2), '/images/quaver.gif', 10, 20, new Models.SoundEvent('1Mi', 0)));
+        user.level.notes.push(new Models.Note(200+50, Math.round(mapHeight / 2), '/images/quaver.gif', 10, 20, new Models.SoundEvent('1Re', 0)));
+        user.level.notes.push(new Models.Note(250+50, Math.round(mapHeight / 2), '/images/quaver.gif', 10, 20, new Models.SoundEvent('1Do', 0)));
+        user.level.notes.push(new Models.Note(275+50, Math.round(mapHeight / 2), '/images/quaver.gif', 10, 20, new Models.SoundEvent('1Mi', 0)));
+        user.level.notes.push(new Models.Note(300+50, Math.round(mapHeight / 2), '/images/quaver.gif', 10, 20, new Models.SoundEvent('1Re', 0)));
+        user.level.notes.push(new Models.Note(325+50, Math.round(mapHeight / 2), '/images/quaver.gif', 10, 20, new Models.SoundEvent('1Re', 0)));
+        user.level.notes.push(new Models.Note(350+50, Math.round(mapHeight / 2), '/images/quaver.gif', 10, 20, new Models.SoundEvent('1Do', 0)));
 
         this.users[req.socket.id] = user;
 
