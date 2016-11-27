@@ -1,11 +1,14 @@
-/**
- * UserController.js
- *
- * @module      :: Controller
- * @description :: Provides the base user
- *                 actions used to make waterlock work.
- *
- * @docs        :: http://waterlock.ninja/documentation
- */
 
-module.exports = {};
+module.exports = {
+    register: function(req, res){
+        return res.view('auth/register');
+    },
+
+    login: function(req, res){
+        return res.view('auth/login');
+    },
+
+    logout: function(req, res){
+        return res.redirect('/');
+    },
+};
