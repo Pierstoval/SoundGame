@@ -1,3 +1,8 @@
 
-<canvas id="game" style="position: absolute; left: 0; top: 0; margin: 0; padding: 0; outline: solid 1px #000;"></canvas>
-<pre id="content" style="position: absolute; top: 0;"></pre>
+<div class="canvas_container">
+    <canvas id="background" class="game_canvas" style="z-index: 0;"></canvas>
+    <canvas id="world" class="game_canvas" style="z-index: 1;"></canvas>
+    <canvas id="ui" class="game_canvas" style="z-index: 2;"></canvas>
+</div>
+
+<% block('javascripts', '<script src="/game/app.js"></script>') %>
