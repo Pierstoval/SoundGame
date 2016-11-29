@@ -4,11 +4,12 @@
  * @constructor
  */
 let Game = function () {
-    this.init.apply(this, arguments);
+    this.__construct.apply(this, arguments);
 };
 
 let Helpers    = require('./Helpers');
 let GameModels = require('./GameModels');
+let Drawer     = require('./Drawer');
 
 Game.prototype = {
 
@@ -17,7 +18,8 @@ Game.prototype = {
     background:        null,
     backgroundContext: null,
 
-    world:        null,
+    world: null,
+
     worldContext: null,
 
     ui:        null,
@@ -25,40 +27,65 @@ Game.prototype = {
 
     io: null,
 
-    assets: {
-        images: {},
-        sounds: {},
-    },
-
     // Avoids sending key events all the time for the same key, saves memory
     pressed_keys: {},
 
     rendered: false,
 
+    // Mutable data that are used for drawing purpose
+    data: {
+        soundsToPlay: [],
+        pick:         {
+            x:        0,
+            y:        0,
+            radius:   0,
+            angle:    0,
+            imageUrl: '',
+        },
+        map:          {
+            width:  0,
+            height: 0,
+        },
+        level:        {
+            images: {},
+            sounds: {},
+            notes:  {},
+        },
+    },
+
+    /**
+     * @constructor
+     * @param {Window} window
+     * @param {Object} io
+     */
+    __construct: function (window, io) {
+        this.io       = io;
+        this.window   = window || {};
+        this.document = window.document;
+
+        if (!this.io || (this.io && !this.io.socket) || !(this.window instanceof Window) || !(this.document instanceof HTMLDocument)) {
+            console.error('Game dependencies not injected properly');
+        }
+    },
+
+    /**
+     * To be executed once instanciated
+     */
     start: function () {
         let _this = this;
 
         this.io.socket.post('/s/game/register', {}, function () {
             _this.register.apply(_this, arguments);
         });
-    },
 
-    /**
-     * @constructor
-     * @param {Document} document
-     * @param {Object} io
-     */
-    init: function (document, io) {
-        this.io       = io;
-        this.document = document;
-
-        if (!this.io || (this.io && !this.io.socket) || !(this.document instanceof Document)) {
-            console.error('Game dependencies not injected properly');
-        }
+        this.io.socket.on('disconnect', function () {
+            Drawer.stopDrawing();
+        });
     },
 
     /**
      * This is the callback that has to be executed right after the registration was made via websocket.
+     * GameData is serialized from the app.
      *
      * @param {Object} gameData
      * @param {Object} response
@@ -76,29 +103,82 @@ Game.prototype = {
             return;
         }
 
-        this.initCanvases(gameData);
+        this.data.map.width  = gameData.w;
+        this.data.map.height = gameData.h;
 
-        this.assets.sounds = gameData.assets.sounds;
+        this.data.level.name   = gameData.ln;
+        this.data.level.sounds = gameData.s;
+        this.data.level.images = gameData.i;
+        this.data.level.notes  = gameData.n;
 
-        /**
-         * Game sync.
-         * Basically redraws the game canvas.
-         */
-        this.io.socket.on('game', function () {
-            _this.tick.apply(_this, arguments);
-        });
+        this.initCanvases();
 
-        this.initListeners();
+        let images               = this.data.level.images;
+        let sounds               = this.data.level.sounds;
+        let numberOfImages       = images.length;
+        let numberOfLoadedImages = 0;
+
+        // We nest callbacks here because we need all components to be loaded before we start the game.
+        // Load game only when images and sounds are loaded.
+        for (let i = 0; i < numberOfImages; i++) {
+            let image = new Image();
+
+            // ========================
+            // Start callback
+            image.onload = function () {
+                numberOfLoadedImages++;
+                // First, load images. When loaded, load sounds.
+                if (numberOfLoadedImages === numberOfImages) {
+
+                    let numberOfAudio       = 0;
+                    let numberOfLoadedAudio = 0;
+
+                    for (let soundId in sounds) {
+                        if (!sounds.hasOwnProperty(soundId)) {
+                            continue;
+                        }
+                        numberOfAudio++;
+                    }
+                    for (let soundId in sounds) {
+                        if (!sounds.hasOwnProperty(soundId)) {
+                            continue;
+                        }
+                        let audio = new Audio(sounds[soundId]);
+
+                        // ========================
+                        // Start callback
+                        audio.addEventListener('canplaythrough', function () {
+                            numberOfLoadedAudio++;
+                            if (numberOfLoadedAudio === numberOfAudio) {
+                                // Finally !
+                                // Now we can set up the tick event received from the server.
+                                _this.io.socket.on('game', function (data) {
+                                    _this.tick.call(_this, data);
+                                });
+
+                                Drawer.startDrawing(_this);
+
+                                _this.initListeners();
+                            }
+                        }, false);
+                        // ========================
+                    }
+
+                }
+            };
+            // ========================
+            image.src    = images[i];
+        }
+
     },
 
     /**
      * Initializes the different canvases so they are the same size.
      * This is important because they will all have transparent background so we can see every layer of the canvas.
-     *
-     * @param {Object} gameData
      */
-    initCanvases: function (gameData) {
+    initCanvases: function () {
         let canvasNames = ['world', 'background', 'ui'];
+
         // Fix canvases size and style according to map informations
         for (let i = 0, l = canvasNames.length; i < l; i++) {
             let canvasName = canvasNames[i];
@@ -106,10 +186,10 @@ Game.prototype = {
             let canvas = document.querySelector('canvas#' + canvasName);
 
             // Setup size both for html tag and canvas drawing area
-            canvas.width        = gameData.map.width;
-            canvas.height       = gameData.map.height;
-            canvas.style.width  = gameData.map.width;
-            canvas.style.height = gameData.map.height;
+            canvas.width        = this.data.map.width;
+            canvas.height       = this.data.map.height;
+            canvas.style.width  = this.data.map.width;
+            canvas.style.height = this.data.map.height;
 
             // Center canvas horizontally
             canvas.style.marginLeft = '-' + Math.round(canvas.width / 2) + 'px';
@@ -132,72 +212,24 @@ Game.prototype = {
      * @param {Object} data
      */
     tick: function (data) {
-        let imageObj, i, l, note;
+        let _this = this;
 
-        let _this        = this;
-        let x            = data.x;
-        let y            = data.y;
-        let radius       = data.r;
-        let angle        = data.a;
-        let imageUrl     = data.i;
-        let notesArray   = data.n;
-        let soundsToPlay = data.snd;
-        let world        = this.world;
-        let worldContext = this.worldContext;
+        // Update game data
+        this.data.pick.x        = data.x;
+        this.data.pick.y        = data.y;
+        this.data.pick.radius   = data.r;
+        this.data.pick.angle    = data.a;
+        this.data.pick.imageUrl = data.i;
+        this.data.soundsToPlay  = data.snd;
 
-        console.info('Receiving tick');
+        let sounds       = this.data.level.sounds;
+        let soundsToPlay = this.data.soundsToPlay;
 
-        if (isNaN(x) || isNaN(y) || isNaN(radius)) {
-            return;
+        // Play sounds that have to be played
+        for (let i = 0, l = soundsToPlay.length; i < l; i++) {
+            Helpers.playSound(soundsToPlay[i].soundId, soundsToPlay[i].delay, sounds);
         }
-
-        // document.getElementById('content').innerHTML = JSON.stringify(data, null, 4);
-
-        // Clear the whole canvas to redraw it
-        worldContext.save();
-        worldContext.clearRect(0, 0, world.width, world.height);
-        worldContext.globalAlpha = 0;
-        worldContext.restore();
-
-        let angleRadians = angle * (Math.PI / 180);
-
-        for (i = 0, l = soundsToPlay.length; i < l; i++) {
-            Helpers.playSound(soundsToPlay[i].soundId, soundsToPlay[i].delay, this.assets.sounds);
-        }
-
-        // Draw notes
-        for (i = 0, l = notesArray.length; i < l; i++) {
-            note = notesArray[i];
-            if (this.assets.images[note.i]) {
-                Helpers.drawImage(worldContext, note.x, note.y, 0, this.assets.images[note.i]);
-            } else {
-                imageObj        = new Image();
-                imageObj._note  = note;
-                imageObj.src    = note.i;
-                imageObj.onload = function () {
-                    _this.assets.images[this._note.i] = new GameModels.InternalImage(this, {
-                        x: -1 * this.width / 2,
-                        y: -1 * this.height / 10
-                    });
-                    Helpers.drawImage(worldContext, this._note.x, this._note.y, 0, _this.assets.images[this._note.i]);
-                };
-            }
-        }
-
-        // Draw user pick
-        if (this.assets.images[imageUrl]) {
-            Helpers.drawImage(worldContext, x, y, -1 * angleRadians, this.assets.images[imageUrl]);
-        } else {
-            imageObj        = new Image();
-            imageObj.src    = imageUrl;
-            imageObj.onload = function () {
-                _this.assets.images[imageUrl] = new GameModels.InternalImage(this, {
-                    x: -1 * this.width / 2,
-                    y: -1 * this.height / 10
-                });
-                Helpers.drawImage(worldContext, x, y, -1 * angleRadians, _this.assets.images[imageUrl]);
-            };
-        }
+        this.data.soundsToPlay = [];
 
         if (!this.rendered) {
             this.io.socket.post('/s/game/set_rendered', {}, function (body, response) {
@@ -209,6 +241,13 @@ Game.prototype = {
 
     initListeners: function () {
         let game = this;
+
+        const keyMovements = {
+            37: 'left',
+            38: 'up',
+            39: 'right',
+            40: 'down'
+        };
 
         /**
          * Key events to send via websocket
@@ -225,6 +264,10 @@ Game.prototype = {
             game.io.socket.post('/s/game/keydown', {
                 key_code: event.keyCode
             });
+
+            if (keyMovements[event.keyCode]) {
+                event.preventDefault();
+            }
         });
 
         this.document.addEventListener('keyup', function (event) {
@@ -233,6 +276,10 @@ Game.prototype = {
             game.io.socket.post('/s/game/keyup', {
                 key_code: event.keyCode
             });
+
+            if (keyMovements[event.keyCode]) {
+                event.preventDefault();
+            }
         });
     }
 };

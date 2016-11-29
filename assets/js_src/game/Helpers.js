@@ -20,8 +20,8 @@ module.exports = {
         }
 
         // Make vars "safe"
-        x            = x || 0;
-        y            = y || 0;
+        x            = Math.round(x || 0);
+        y            = Math.round(y || 0);
         angleRadians = angleRadians || 0;
 
         // Draw

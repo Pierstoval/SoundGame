@@ -1,11 +1,7 @@
+let Game = require('./Game');
 // Should be dumped to js/app.js
-(function (w, d, io) {
-    "use strict";
+(function (w, io) {
 
-    let Game = require('./Game');
+    new Game(w, io).start();
 
-    let game = new Game(d, io);
-
-    game.start();
-
-})(window, window.document, io);
+})(window, io);
