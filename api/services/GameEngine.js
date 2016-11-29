@@ -20,67 +20,31 @@ module.exports = {
      * Executed in the GameController.socketRegister route action.
      */
     addUserFromSocketRequest: function (req) {
-        let mapWidth  = 500;
-        let mapHeight = 500;
+
+        let level = require('../game_levels/level_1');
 
         let user = {
             id:               req.socket.id,
             rendered:         false,
             soundsToPlay:     [],
             pick:             new Models.Pick(
-                25,// Math.round(mapWidth / 2),
-                Math.round(mapHeight / 2),
-                2,
-                90, // In degree
-                1,
-                4, // In degree
+                Math.round(level.mapWidth / 2),
+                Math.round(level.mapHeight / 2) - 50,
+                2, // Radius
+                90, // Start angle in degrees
+                1, // Speed
+                4, // Rotation speed in degrees
                 '/images/guitar-pick.gif'
             ),
-            map:              {
-                width:  mapWidth,
-                height: mapHeight,
-            },
-            assets:           {
-                sounds: {
-                    '0Sol#':  '/sounds/68447__pinkyfinger__piano-g.wav',
-                    '1La':  '/sounds/68437__pinkyfinger__piano-a.wav',
-                    '1Sib': '/sounds/68439__pinkyfinger__piano-bb.wav',
-                    '1Si':  '/sounds/68438__pinkyfinger__piano-b.wav',
-                    '1Do':  '/sounds/68441__pinkyfinger__piano-c.wav',
-                    '1Re#':  '/sounds/68440__pinkyfinger__piano-c.wav',
-                    '1Re':  '/sounds/68442__pinkyfinger__piano-d.wav',
-                    '1Mib': '/sounds/68444__pinkyfinger__piano-eb.wav',
-                    '1Mi':  '/sounds/68443__pinkyfinger__piano-e.wav',
-                    '1Fab':  '/sounds/68446__pinkyfinger__piano-f.wav',
-                    '1Fa':  '/sounds/68445__pinkyfinger__piano-f.wav',
-                    '1Sol':  '/sounds/68448__pinkyfinger__piano-g.wav',
-                },
-            },
             movements:        {
                 left:  false,
                 right: false,
                 up:    false,
                 down:  false,
             },
-            level:            {
-                notes: []
-            },
             collidingObjects: {},
+            level: level,
         };
-
-        // Add notes
-        let coords = 100;
-        user.level.notes.push(new Models.Note( 50+50, Math.round(mapHeight / 2), '/images/quaver.gif', 10, 20, new Models.SoundEvent('1Do', 0)));
-        user.level.notes.push(new Models.Note( 75+50, Math.round(mapHeight / 2), '/images/quaver.gif', 10, 20, new Models.SoundEvent('1Do', 0)));
-        user.level.notes.push(new Models.Note(100+50, Math.round(mapHeight / 2), '/images/quaver.gif', 10, 20, new Models.SoundEvent('1Do', 0)));
-        user.level.notes.push(new Models.Note(125+50, Math.round(mapHeight / 2), '/images/quaver.gif', 10, 20, new Models.SoundEvent('1Re', 0)));
-        user.level.notes.push(new Models.Note(150+50, Math.round(mapHeight / 2), '/images/quaver.gif', 10, 20, new Models.SoundEvent('1Mi', 0)));
-        user.level.notes.push(new Models.Note(200+50, Math.round(mapHeight / 2), '/images/quaver.gif', 10, 20, new Models.SoundEvent('1Re', 0)));
-        user.level.notes.push(new Models.Note(250+50, Math.round(mapHeight / 2), '/images/quaver.gif', 10, 20, new Models.SoundEvent('1Do', 0)));
-        user.level.notes.push(new Models.Note(275+50, Math.round(mapHeight / 2), '/images/quaver.gif', 10, 20, new Models.SoundEvent('1Mi', 0)));
-        user.level.notes.push(new Models.Note(300+50, Math.round(mapHeight / 2), '/images/quaver.gif', 10, 20, new Models.SoundEvent('1Re', 0)));
-        user.level.notes.push(new Models.Note(325+50, Math.round(mapHeight / 2), '/images/quaver.gif', 10, 20, new Models.SoundEvent('1Re', 0)));
-        user.level.notes.push(new Models.Note(350+50, Math.round(mapHeight / 2), '/images/quaver.gif', 10, 20, new Models.SoundEvent('1Do', 0)));
 
         this.users[req.socket.id] = user;
 
@@ -131,7 +95,7 @@ module.exports = {
             ) {
 
                 // Test collisions ONLY if we moved
-                for (var i = 0, l = user.level.notes.length; i < l; i++) {
+                for (let i = 0, l = user.level.notes.length; i < l; i++) {
                     let note            = user.level.notes[i];
                     let collides        = CollisionsManager.testPickAndNoteCollide(user.pick, note);
                     let alreadyCollides = user.collidingObjects[note.uuid];
@@ -144,7 +108,6 @@ module.exports = {
                     }
                 }
 
-                // console.info(JSON.stringify(user));
                 sails.sockets.broadcast(id, 'game', data);
 
                 if (user.soundsToPlay.length) {
@@ -202,15 +165,15 @@ module.exports = {
 
             let angleRadians = user.pick.angle * (Math.PI / 180);
 
-            let x = user.pick.x + moveRatio * user.pick.speed * Math.sin(angleRadians);
-            let y = user.pick.y + moveRatio * user.pick.speed * Math.cos(angleRadians);
+            let x = user.pick.x + (moveRatio * user.pick.speed * Math.sin(angleRadians));
+            let y = user.pick.y + (moveRatio * user.pick.speed * Math.cos(angleRadians));
 
             // Avoids collisions with canvas walls
-            if (x > 0 && x < user.map.width) {
-                user.pick.x = Math.round(x);
+            if (x >= 0 && x <= user.level.mapWidth) {
+                user.pick.x = Math.round(x * 100) / 100;
             }
-            if (y > 0 && y < user.map.height) {
-                user.pick.y = Math.round(y);
+            if (y >= 0 && y <= user.level.mapHeight) {
+                user.pick.y = Math.round(y * 100) / 100;
             }
         }
 

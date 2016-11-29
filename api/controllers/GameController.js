@@ -14,7 +14,7 @@ module.exports = {
 
         let user = GameEngine.addUserFromSocketRequest(req);
 
-        return res.ok(user);
+        return res.ok(Serializer.serializeWorldFromUser(user));
     },
 
     socketSetRendered: function (req, res) {

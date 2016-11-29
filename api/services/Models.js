@@ -1,5 +1,5 @@
 
-var uuid = require('node-uuid');
+let uuid = require('node-uuid');
 
 /**
  * @namespace Models
@@ -67,14 +67,13 @@ module.exports = {
      * @class
      *
      * @param {string} soundId
-     * @param {number} delay
+     * @param {number} [delay] optional delay to execute this specific sound
      *
      * @property {string} soundId
      * @property {number} delay
      */
     SoundEvent: function (soundId, delay) {
         this.soundId = soundId;
-        this.delay   = delay;
+        this.delay   = delay || 0;
     }
 };
-

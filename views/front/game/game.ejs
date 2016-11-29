@@ -4,5 +4,8 @@
     <canvas id="world" class="game_canvas" style="z-index: 1;"></canvas>
     <canvas id="ui" class="game_canvas" style="z-index: 2;"></canvas>
 </div>
+<% if (sails.config.environment === 'development') { %>
+<div id="debug" style="font-family: monospace;"></div>
+<% } %>
 
 <% block('javascripts', '<script src="/game/app.js"></script>') %>

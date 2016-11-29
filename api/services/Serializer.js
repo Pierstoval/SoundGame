@@ -17,15 +17,32 @@ module.exports = {
             a: user.pick.angle,
             s: user.pick.speed,
             i: user.pick.imageUrl,
-            n: this.serializeNotesArray(user.level.notes),
             snd: user.soundsToPlay,
         };
     },
 
-    serializeNotesArray: function(notes) {
-        var serializedNotes = [];
+    /**
+     * These data are sent when the user registers to the game.
+     * This is the websocket response.
+     *
+     * @param user
+     * @this Serializer
+     */
+    serializeWorldFromUser: function (user) {
+        return {
+            ln: user.level.name,
+            w: user.level.mapWidth,
+            h: user.level.mapHeight,
+            i: user.level.images,
+            s: user.level.sounds,
+            n: this.serializeNotesArray(user.level.notes),
+        };
+    },
 
-        for (var i = 0, l = notes.length; i < l; i++) {
+    serializeNotesArray: function(notes) {
+        let serializedNotes = [];
+
+        for (let i = 0, l = notes.length; i < l; i++) {
             let note = notes[i];
             serializedNotes.push({
                 x: note.x,
