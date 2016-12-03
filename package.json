@@ -1,5 +1,5 @@
 {
-  "name": "sails",
+  "name": "orbitale-soundgame",
   "private": true,
   "version": "0.0.0",
   "description": "a Sails application",
@@ -7,29 +7,29 @@
   "dependencies": {
     "babel-preset-es2015": "^6.18.0",
     "babelify": "^7.3.0",
-    "bcrypt": "~0.8.0",
-    "ejs": "2.3.4",
+    "bcrypt": "^0.8.0",
+    "ejs": "^2.3.4",
     "font-awesome": "^4.7.0",
-    "grunt": "1.0.1",
+    "grunt": "^1.0.1",
     "grunt-browserify": "^5.0.0",
-    "grunt-contrib-clean": "1.0.0",
-    "grunt-contrib-coffee": "1.0.0",
-    "grunt-contrib-concat": "1.0.1",
-    "grunt-contrib-copy": "1.0.0",
-    "grunt-contrib-cssmin": "1.0.1",
-    "grunt-contrib-jst": "1.0.0",
-    "grunt-contrib-less": "1.3.0",
-    "grunt-contrib-uglify": "1.0.1",
-    "grunt-contrib-watch": "1.0.0",
-    "grunt-sails-linker": "~0.10.1",
-    "grunt-sync": "0.5.2",
+    "grunt-contrib-clean": "^1.0.0",
+    "grunt-contrib-coffee": "^1.0.0",
+    "grunt-contrib-concat": "^1.0.1",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-cssmin": "^1.0.1",
+    "grunt-contrib-jst": "^1.0.0",
+    "grunt-contrib-less": "^1.3.0",
+    "grunt-contrib-uglify": "^1.0.1",
+    "grunt-contrib-watch": "^1.0.0",
+    "grunt-sails-linker": "^0.10.1",
+    "grunt-sync": "^0.5.2",
     "include-all": "^1.0.0",
     "jquery": "^3.1.1",
     "materialize-css": "^0.97.8",
-    "node-uuid": "^1.4.7",
-    "rc": "1.0.1",
-    "sails": "~0.12.8",
-    "sails-disk": "~0.10.9"
+    "rc": "^1.0.1",
+    "sails": "^0.12.8",
+    "sails-disk": "^0.10.9",
+    "uuid": "^3.0.1"
   },
   "scripts": {
     "debug": "node debug app.js",
@@ -38,7 +38,7 @@
   "main": "app.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/Pierstoval/sails.git"
+    "url": "git://github.com/Pierstoval/SoundGame.git"
   },
   "author": "Pierstoval",
   "license": "proprietary"
