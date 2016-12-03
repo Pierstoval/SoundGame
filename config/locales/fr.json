@@ -1,3 +1,22 @@
 {
-    "projet_perso": "Ceci est un projet personnel sans prétention. Si vous avez accès à ce site, vous savez certainement comment me contacter, et je vous invite à le faire si vous trouvez un bug ;)"
+    "projet_perso": "Ceci est un projet personnel sans prétention. Si vous avez accès à ce site, vous savez certainement comment me contacter, et je vous invite à le faire si vous trouvez un bug ;)",
+    "sound_game_presentation": "Un petit jeu tout simple où vous déplacez une loupiote vers d'autres loupiotes, et ça fait du bruit...",
+    "play": "Jouer",
+    "game_start_test_level_1_link": "Niveau 1",
+    "game_start_test_level_1": "Vous avez la possibilité de tester le niveau 1 du jeu pour apprendre à le découvrir, et peut-être reconnaître la musique qui y est utilisée ?",
+    "game_start_subscribe_link": "S'inscrire",
+    "game_start_subscribe": "Vous pouvez vous inscrire afin de conserver votre progression ou recevoir des informations sur les nouveautés.",
+    "game_start_login_link": "Se connecter",
+    "game_start_login": "Si vous avez déjà un compte, connectez-vous afin de reprendre le jeu là où vous l'avez laissé.",
+    "email": "Adresse e-mail",
+    "username": "Nom d'utilisateur",
+    "password": "Mot de passe",
+    "login": "Connexion",
+    "profile": "Profil",
+    "logout": "Déonnexion",
+    "register": "Inscription",
+    "errors_validation_username": "Le nom d'utilisateur doit être composé d'au moins 5 caractères",
+    "errors_validation_password": "Le mot de passe doit contenir au moins 6 caractères",
+    "errors_validation_email": "Veuillez entrer une adresse e-mail valide",
+    "registration_success": "Inscription réussie !"
 }
