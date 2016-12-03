@@ -48,6 +48,18 @@ module.exports = function (grunt) {
                     src:    ['materialize.min.css'],
                     dest:   '.tmp/public/styles/'
                 },
+                { // Fontawesome CSS
+                    expand: true,
+                    cwd:    './node_modules/font-awesome/css/',
+                    src:    ['font-awesome.min.css'],
+                    dest:   '.tmp/public/styles/'
+                },
+                { // Fontawesome fonts
+                    expand: true,
+                    cwd:    './node_modules/font-awesome/fonts/',
+                    src:    ['**'],
+                    dest:   '.tmp/public/fonts/'
+                },
                 { // jQuery
                     expand: true,
                     cwd:    './node_modules/jquery/dist/',
