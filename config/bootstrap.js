@@ -10,7 +10,11 @@
  */
 
 module.exports.bootstrap = function (cb) {
-    SocketLooper.init();
+
+    sails.on('lifted', function () {
+        SocketLooper.init();
+        console.info('Sails routes', JSON.stringify(sails.config.routes, null, 4));
+    });
 
     // It's very important to trigger this callback method when you are finished
     // with the bootstrap!  (otherwise your server will never lift, since it's waiting on the bootstrap)
