@@ -44,9 +44,32 @@ html {
             margin: 5px 0;
         }
 
+        .left-navigation {
+            margin-left: 60px;
+        }
+
+        a.btn.button-collapse {
+            min-width: 30px;
+            margin: 0;
+        }
+
         a,
         ul a {
             color: black;
+        }
+    }
+}
+
+.btn.center-block {
+    display: block;
+}
+
+@media only screen and (max-width: 601px) {
+    html {
+        nav {
+            .brand-logo img {
+                max-height: 47px;
+            }
         }
     }
 }
