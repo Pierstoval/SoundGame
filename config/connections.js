@@ -85,7 +85,6 @@ module.exports.connections = {
     //   database: 'YOUR_POSTGRES_DB' //optional
     // }
 
-
     /***************************************************************************
      *                                                                          *
      * More adapters: https://github.com/balderdashy/sails                      *

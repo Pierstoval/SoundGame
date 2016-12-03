@@ -1,0 +1,7 @@
+<% if (req.session.me) { %>
+    <li><a href="/profile"><%= __('profile') %></a></li>
+    <li><a href="/logout"><%= __('logout') %></a></li>
+<% } else { %>
+    <li><a href="/login"><%= __('login') %></a></li>
+    <li><a href="/register"><%= __('register') %></a></li>
+<% } %>

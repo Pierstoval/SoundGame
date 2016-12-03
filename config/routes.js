@@ -27,6 +27,7 @@ module.exports.routes = {
 
     // Authentication
     'GET /register': 'UserController.register',
+    'POST /register': 'UserController.register',
     'GET /login':    'UserController.login',
     'POST /login':   'UserController.login',
     'GET /logout':   'UserController.logout',

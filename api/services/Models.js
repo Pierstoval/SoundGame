@@ -1,5 +1,5 @@
 
-let uuid = require('node-uuid');
+let uuid = require('uuid');
 
 /**
  * @namespace Models
