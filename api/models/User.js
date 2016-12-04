@@ -8,7 +8,7 @@ module.exports = {
 
     attributes: {
 
-        uuid: {
+        id: {
             type:               'string',
             primaryKey:         true,
             required:           true,
@@ -18,6 +18,10 @@ module.exports = {
             defaultsTo:         function () {
                 return uuid.v4();
             }
+        },
+
+        salt: {
+            type: 'string'
         },
 
         username: {
@@ -59,9 +63,9 @@ module.exports = {
         bcrypt.genSalt(10, function (err, salt) {
             bcrypt.hash(user.password, salt, function (err, hash) {
                 if (err) {
-                    console.log(err);
                     cb(err);
                 } else {
+                    user.salt     = salt;
                     user.password = hash;
                     cb();
                 }
@@ -87,7 +91,6 @@ module.exports = {
                 password: inputs.password
             })
             .exec(function (err, user) {
-                console.info('user create callback');
                 return cb(err, user);
             })
         ;
@@ -103,22 +106,27 @@ module.exports = {
      * @param  {Function} cb
      */
     attemptLogin: function (inputs, cb) {
-        bcrypt.genSalt(10, function (err, salt) {
-            bcrypt.hash(inputs.password, salt, function (err, hash) {
-                if (err) {
-                    console.log(err);
-                    cb(err);
-                } else {
-                    // Create a user
-                    User
-                        .findOne({
-                            email:    inputs.email,
-                            password: hash
-                        })
-                        .exec(cb)
-                    ;
+
+        User
+            .findOne({
+                or: [
+                    { email: inputs.usernameOrEmail },
+                    { username: inputs.usernameOrEmail }
+                ]
+            })
+            .exec(function (err, user) {
+                if (!user) {
+                    return cb(err);
                 }
-            });
-        });
+
+                bcrypt.hash(inputs.password, user.salt, function (err, hash) {
+                    if (hash !== user.password) {
+                        return cb(err);
+                    }
+
+                    return cb(null, user);
+                });
+            })
+        ;
     }
 };
