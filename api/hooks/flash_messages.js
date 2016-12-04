@@ -2,6 +2,10 @@
 
 let _session_key = 'flash';
 
+/**
+ * Handle flash messages.
+ * This hook adds some methods in the Request object that allow you to add, remove, or get flash messages.
+ */
 module.exports = function flashMessages(sails) {
     return {
         routes: {
@@ -44,9 +48,6 @@ module.exports = function flashMessages(sails) {
                     req.getFlash    = get;
                     req.hasFlash    = has;
                     req.getAllFlash = all;
-
-                    res.addFlash = add;
-                    res.hasFlash = has;
 
                     return next();
                 }
