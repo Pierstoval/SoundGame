@@ -19,8 +19,6 @@
 
 <div class="container">
 
-    <p>Me: <%= JSON.stringify(req.session, null, 4) %></p>
-
     <%
     var flash = req.getAllFlash();
     if (Object.keys(flash).length) {
