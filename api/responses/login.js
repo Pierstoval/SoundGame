@@ -1,13 +1,15 @@
 /**
- * res.login([inputs])
+ * Used in UserController to handle login action.
+ * Calls User.attemptLogin, which makes the query in the database.
  *
- * @param {String} inputs.username
+ * @param {String} inputs.usernameOrEmail
  * @param {String} inputs.password
+ * @param {String} inputs.invalidRedirect
+ * @param {String} inputs.successRedirect
  *
  * @description :: Log the requesting user in using a passport strategy
  * @help        :: See http://links.sailsjs.org/docs/responses
  */
-
 module.exports = function login(inputs) {
     inputs = inputs || {};
 
@@ -17,10 +19,12 @@ module.exports = function login(inputs) {
 
     // Look up the user
     User.attemptLogin({
-        email: inputs.email,
+        usernameOrEmail: inputs.usernameOrEmail,
         password: inputs.password
     }, function (err, user) {
-        if (err) return res.negotiate(err);
+        if (err) {
+            return res.negotiate(err);
+        }
         if (!user) {
 
             // If this is not an HTML-wanting browser, e.g. AJAX/sockets/cURL/etc.,
@@ -29,6 +33,9 @@ module.exports = function login(inputs) {
             if (req.wantsJSON || !inputs.invalidRedirect) {
                 return res.badRequest('Invalid username/password combination.');
             }
+
+            req.addFlash('error', sails.__('login_invalid_credentials'));
+
             // Otherwise if this is an HTML-wanting browser, redirect to /login.
             return res.redirect(inputs.invalidRedirect);
         }
@@ -36,6 +43,8 @@ module.exports = function login(inputs) {
         // "Remember" the user in the session
         // Subsequent requests from this user agent will have `req.session.me` set.
         req.session.me = user.id;
+
+        req.addFlash('success', sails.__('login_success'));
 
         // If this is not an HTML-wanting browser, e.g. AJAX/sockets/cURL/etc.,
         // send a 200 response letting the user agent know the login was successful.

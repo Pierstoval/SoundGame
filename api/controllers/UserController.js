@@ -12,10 +12,8 @@ module.exports = {
             return res.view('front/auth/login');
         }
 
-        console.info('probably post', req.method);
-
         return res.login({
-            email:           req.param('email'),
+            usernameOrEmail: req.param('username_or_email'),
             password:        req.param('password'),
             successRedirect: '/',
             invalidRedirect: '/login'
@@ -30,6 +28,7 @@ module.exports = {
         // "Forget" the user from the session.
         // Subsequent requests from this user agent will NOT have `req.session.me`.
         req.session.me = null;
+        req.user = null;
 
         // If this is not an HTML-wanting browser, e.g. AJAX/sockets/cURL/etc.,
         // send a simple response letting the user agent know they were logged out
@@ -68,7 +67,6 @@ module.exports = {
                         if (errors.email) {
                             errorsToReturn.push(sails.__('errors_validation_email'));
                         }
-                        console.info(errors);
                     }
 
                     return res.view('front/auth/register', { errors: errorsToReturn });
@@ -86,7 +84,7 @@ module.exports = {
                 }
 
                 // Otherwise if this is an HTML-wanting browser, redirect to /welcome.
-                res.addFlash('success', sails.__('registration_success'));
+                req.addFlash('success', sails.__('registration_success'));
 
                 return res.redirect('/');
             });
