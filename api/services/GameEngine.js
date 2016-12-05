@@ -30,11 +30,11 @@ module.exports = {
             pick:             new Models.Pick(
                 Math.round(level.mapWidth / 2),
                 Math.round(level.mapHeight / 2) - 50,
-                2, // Radius
+                5, // Radius
                 90, // Start angle in degrees
                 1, // Speed
                 4, // Rotation speed in degrees
-                '/images/guitar-pick.gif'
+                null
             ),
             movements:        {
                 left:  false,
@@ -127,6 +127,7 @@ module.exports = {
         }
 
         this.users[id].movements[movementString] = !!value;
+        this.users[id].pick.moveRatio = this.users[id].movements.up ? 1 : -1;
     },
 
     applyMovement: function (user) {

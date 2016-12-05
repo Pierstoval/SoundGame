@@ -2,6 +2,8 @@
 let uuid = require('uuid');
 
 /**
+ * Used for plain models that are used in the application.
+ *
  * @namespace Models
  */
 module.exports = {
@@ -15,7 +17,7 @@ module.exports = {
      * @param {number} angle in degrees
      * @param {number} speed in pixels per tick
      * @param {number} angleSpeed in degrees per tick
-     * @param {string} imageUrl
+     * @param {string|null} imageUrl
      *
      * @property {number} x
      * @property {number} y
@@ -23,7 +25,8 @@ module.exports = {
      * @property {number} angle
      * @property {number} speed
      * @property {number} angleSpeed
-     * @property {string} imageUrl
+     * @property {string|null} imageUrl
+     * @property {number} moveRatio
      */
     Pick: function (x, y, radius, angle, speed, angleSpeed, imageUrl) {
         this.x          = x;
@@ -33,6 +36,7 @@ module.exports = {
         this.speed      = speed;
         this.angleSpeed = angleSpeed;
         this.imageUrl   = imageUrl;
+        this.moveRatio  = 1; // 1 for "forward", -1 for "backwards"
     },
 
     /**

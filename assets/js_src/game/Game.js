@@ -156,9 +156,11 @@ Game.prototype = {
                                     _this.tick.call(_this, data);
                                 });
 
+                                // ================
+                                // Start the game HERE
                                 Drawer.startDrawing(_this);
-
                                 _this.initListeners();
+                                // ================
                             }
                         }, false);
                         // ========================
@@ -215,12 +217,14 @@ Game.prototype = {
         let _this = this;
 
         // Update game data
-        this.data.pick.x        = data.x;
-        this.data.pick.y        = data.y;
-        this.data.pick.radius   = data.r;
-        this.data.pick.angle    = data.a;
-        this.data.pick.imageUrl = data.i;
-        this.data.soundsToPlay  = data.snd;
+        this.data.pick.x         = data.x;
+        this.data.pick.y         = data.y;
+        this.data.pick.radius    = data.r;
+        this.data.pick.angle     = data.a;
+        this.data.pick.speed     = data.s;
+        this.data.pick.moveRatio = data.mr;
+        this.data.pick.imageUrl  = data.i;
+        this.data.soundsToPlay   = data.snd;
 
         let sounds       = this.data.level.sounds;
         let soundsToPlay = this.data.soundsToPlay;

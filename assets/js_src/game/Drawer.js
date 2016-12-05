@@ -73,6 +73,8 @@ module.exports = {
         let angle     = game.data.pick.angle;
         let x         = game.data.pick.x;
         let y         = game.data.pick.y;
+        let radius    = game.data.pick.radius;
+        let speed     = game.data.pick.speed;
 
         // Clear the whole canvas to redraw it
         world.save();
@@ -80,9 +82,21 @@ module.exports = {
         world.globalAlpha = 0;
         world.restore();
 
+        // Draw user pick
+        this.drawBlurryCircle(world, x, y, radius, 3 * radius);
+
+        // Draw a line to know which angle we are facing
         let angleRadians = angle * (Math.PI / 180);
 
-        // Draw user pick
+        let nextX = x + (radius * speed * Math.sin(angleRadians));
+        let nextY = y + (radius * speed * Math.cos(angleRadians));
+
+        world.beginPath();
+        world.moveTo(x, y);
+        world.lineTo(nextX, nextY);
+        world.stroke();
+
+        /*
         if (images[pickImage]) {
             Helpers.drawImage(world, x, y, -1 * angleRadians, images[pickImage]);
         } else {
@@ -96,6 +110,25 @@ module.exports = {
                 Helpers.drawImage(world, x, y, -1 * angleRadians, images[pickImage]);
             };
         }
+        */
+    },
+
+    drawBlurryCircle: function (context, x, y, radius, blur) {
+        context.save();
+        context.shadowBlur    = blur;
+        context.shadowOffsetX = 0;
+        context.shadowOffsetY = 0;
+
+        context.strokeStyle = '#FF0000';
+        context.fillStyle   = "#FF0000";
+        context.shadowColor = "#0000FF"; //set the shadow colour to that of the fill
+
+        context.beginPath();
+        context.arc(x, y, radius, 0, Math.PI * 2, true);
+        context.fill();
+        context.stroke();
+
+        context.restore();
     },
 
     /**

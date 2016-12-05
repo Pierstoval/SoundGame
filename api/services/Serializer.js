@@ -17,6 +17,7 @@ module.exports = {
             a: user.pick.angle,
             s: user.pick.speed,
             i: user.pick.imageUrl,
+            mr: user.pick.moveRatio,
             snd: user.soundsToPlay,
         };
     },
