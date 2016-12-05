@@ -225,6 +225,7 @@ Game.prototype = {
         this.data.pick.moveRatio = data.mr;
         this.data.pick.imageUrl  = data.i;
         this.data.soundsToPlay   = data.snd;
+        this.data.numberOfTicks  = data.nt;
 
         let sounds       = this.data.level.sounds;
         let soundsToPlay = this.data.soundsToPlay;

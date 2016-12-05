@@ -19,6 +19,7 @@ module.exports = {
             i: user.pick.imageUrl,
             mr: user.pick.moveRatio,
             snd: user.soundsToPlay,
+            nt: SocketLooper.numberOfTicks
         };
     },
 
