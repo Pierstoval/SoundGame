@@ -29,12 +29,7 @@ module.exports = {
             soundsToPlay:     [],
             pick:             new Models.Pick(
                 Math.round(level.mapWidth / 2),
-                Math.round(level.mapHeight / 2) - 50,
-                5, // Radius
-                90, // Start angle in degrees
-                1, // Speed
-                4, // Rotation speed in degrees
-                null
+                Math.round(level.mapHeight / 2) - 50
             ),
             movements:        {
                 left:  false,

@@ -31,12 +31,12 @@ module.exports = {
     Pick: function (x, y, radius, angle, speed, angleSpeed, imageUrl) {
         this.x          = x;
         this.y          = y;
-        this.radius     = radius;
-        this.angle      = angle;
-        this.speed      = speed;
-        this.angleSpeed = angleSpeed;
-        this.imageUrl   = imageUrl;
-        this.moveRatio  = 1; // 1 for "forward", -1 for "backwards"
+        this.radius     = radius || 5;
+        this.angle      = angle || 90;
+        this.speed      = speed || 1;
+        this.angleSpeed = angleSpeed || 2.5;
+        this.imageUrl   = imageUrl || null;
+        this.moveRatio  = 1; // 1 for "forward", -1 for "backwards",
     },
 
     /**
