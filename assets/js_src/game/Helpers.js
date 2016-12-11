@@ -8,8 +8,8 @@ module.exports = {
     /**
      * @function
      * @param {CanvasRenderingContext2D} context
-     * @param {integer} x
-     * @param {integer} y
+     * @param {Number} x
+     * @param {Number} y
      * @param {float} angleRadians
      * @param {GameModels.InternalImage} internalImage
      */
