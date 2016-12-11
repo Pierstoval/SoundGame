@@ -17,9 +17,9 @@ module.exports = {
     lastData: null,
 
     // Used to make the pick look like it breathes
-    pickBreatheMax: 30,
+    pickBreatheMax: 50,
     pickBreatheValue: 0,
-    pickBreatheIncrement: 0.4,
+    pickBreatheIncrement: 0.5,
 
     /**
      * @param {Game} game
@@ -73,9 +73,6 @@ module.exports = {
          * @type {CanvasRenderingContext2D}
          */
         let world     = game.worldContext;
-        let images    = game.data.level.images;
-        let pickImage = game.data.pick.imageUrl;
-        let angle     = game.data.pick.angle;
         let x         = game.data.pick.x;
         let y         = game.data.pick.y;
         let radius    = game.data.pick.radius;
@@ -88,73 +85,41 @@ module.exports = {
 
         // Draw user pick
         this.drawUserPick(game, world, x, y, radius, 3 * radius);
-
-        /*
-        if (images[pickImage]) {
-            Helpers.drawImage(world, x, y, -1 * angleRadians, images[pickImage]);
-        } else {
-            let imageObj    = new Image();
-            imageObj.src    = pickImage;
-            imageObj.onload = function () {
-                game.data.level.images[pickImage] = new GameModels.InternalImage(this, {
-                    x: -1 * this.width / 2,
-                    y: -1 * this.height / 10
-                });
-                Helpers.drawImage(world, x, y, -1 * angleRadians, images[pickImage]);
-            };
-        }
-        */
     },
 
     drawUserPick: function (game, context, x, y, radius) {
+        let pickImage = game.data.pick.imageUrl;
+
+        context.save();
+
+        context.shadowBlur    = Math.round(this.pickBreatheValue);
+        context.shadowOffsetX = 0;
+        context.shadowOffsetY = 0;
+
+        context.lineWidth   = 0;
+        context.fillStyle   = '#222';
+        context.shadowColor = "#0398fe";
 
         // Draw shadow multiple times to reinforce its visual aspect
         for (let i = 0; i < 2; i++) {
-            context.save();
-
-            context.shadowBlur    = Math.round(this.pickBreatheValue);
-            context.shadowOffsetX = 0;
-            context.shadowOffsetY = 0;
-
-            context.lineWidth   = 0;
-            context.fillStyle   = '#222';
-            context.shadowColor = "#ff0000";
-
             context.beginPath();
-            context.arc(x, y, radius, 0, Math.PI * 2, true);
+            context.arc(x, y, 5, 0, Math.PI * 2, true);
             context.fill();
-
-            context.restore();
         }
-
-        // Draw white circle
-        context.save();
-
-        context.fillStyle = '#cccccc';
-        context.beginPath();
-        context.arc(x, y, radius, 0, Math.PI * 2, true);
-        context.fill();
 
         context.restore();
 
-        // Draw a line to know which angle we are facing
-        let angleRadians = game.data.pick.angle * (Math.PI / 180);
-        let speed        = game.data.pick.speed;
-
-        let baseX = Math.round(x + ((radius * 0.5) * speed * Math.sin(angleRadians)));
-        let baseY = Math.round(y + ((radius * 0.5) * speed * Math.cos(angleRadians)));
-
-        let nextX = Math.round(x + (radius * speed * Math.sin(angleRadians)));
-        let nextY = Math.round(y + (radius * speed * Math.cos(angleRadians)));
-
+        // Draw pick
         context.save();
 
-        context.lineWidth   = 1;
-        context.strokeStyle = "#000000";
-        context.beginPath();
-        context.moveTo(baseX, baseY);
-        context.lineTo(nextX, nextY);
-        context.stroke();
+        if (pickImage) {
+            Helpers.drawImage(context, x, y, 0, game.data.internalImages[pickImage]);
+        } else {
+            context.fillStyle = '#cccccc';
+            context.beginPath();
+            context.arc(x, y, radius, 0, Math.PI * 2, true);
+            context.fill();
+        }
 
         context.restore();
 
@@ -165,7 +130,7 @@ module.exports = {
 
         if (this.pickBreatheValue >= this.pickBreatheMax) {
             this.pickBreatheIncrement = -1 * incr;
-        } else if (this.pickBreatheValue <= radius) {
+        } else if (this.pickBreatheValue <= (2 * radius)) {
             this.pickBreatheIncrement = incr;
         }
 
