@@ -3,7 +3,6 @@ let level = {
     mapHeight: 500,
     notes:  [],
     images: [
-        '/images/guitar-pick.gif',
         '/images/quaver.gif'
     ],
     sounds: {
