@@ -11,13 +11,7 @@ module.exports = {
     /**
      * @class
      *
-     * @param {number} x
-     * @param {number} y
-     * @param {number} radius
-     * @param {number} angle in degrees
-     * @param {number} speed in pixels per tick
-     * @param {number} angleSpeed in degrees per tick
-     * @param {string|null} imageUrl
+     * @param {Object} parameters
      *
      * @property {number} x
      * @property {number} y
@@ -28,14 +22,18 @@ module.exports = {
      * @property {string|null} imageUrl
      * @property {number} moveRatio
      */
-    Pick: function (x, y, radius, angle, speed, angleSpeed, imageUrl) {
-        this.x          = x;
-        this.y          = y;
-        this.radius     = radius || 5;
-        this.angle      = angle || 90;
-        this.speed      = speed || 1;
-        this.angleSpeed = angleSpeed || 2.5;
-        this.imageUrl   = imageUrl || null;
+    Pick: function (parameters) {
+        if (!parameters) {
+            parameters = {};
+        }
+
+        this.x          = parameters.x;
+        this.y          = parameters.y;
+        this.radius     = parameters.radius || 5;
+        this.angle      = parameters.angle || 90;
+        this.speed      = parameters.speed || 1;
+        this.angleSpeed = parameters.angleSpeed || 2.5;
+        this.imageUrl   = parameters.imageUrl || null;
         this.moveRatio  = 1; // 1 for "forward", -1 for "backwards",
     },
 

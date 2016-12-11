@@ -27,10 +27,11 @@ module.exports = {
             id:               req.socket.id,
             rendered:         false,
             soundsToPlay:     [],
-            pick:             new Models.Pick(
-                Math.round(level.mapWidth / 2),
-                Math.round(level.mapHeight / 2) - 50
-            ),
+            pick:             new Models.Pick({
+                x: Math.floor(Math.random() * level.mapWidth) + 1,
+                y: Math.floor(Math.random() * level.mapHeight) + 1,
+                imageUrl: '/images/pick.png'
+            }),
             movements:        {
                 left:  false,
                 right: false,
