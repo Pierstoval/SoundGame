@@ -37,6 +37,7 @@ module.exports = {
             h: user.level.mapHeight,
             i: user.level.images,
             s: user.level.sounds,
+            u: this.serializeDataFromUser(user),
             n: this.serializeNotesArray(user.level.notes),
         };
     },
