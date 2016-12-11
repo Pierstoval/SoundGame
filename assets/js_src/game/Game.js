@@ -111,66 +111,34 @@ Game.prototype = {
         this.data.level.images = gameData.i;
         this.data.level.notes  = gameData.n;
 
+        this.data.internalImages = {};
+
+        let images = this.data.level.images;
+
+        // Add pick to internal images for it to be loaded too
+        if (gameData.u.i) {
+            images.push(gameData.u.i);
+        }
+
+        this.data.images = images;
+
         this.initCanvases();
 
-        let images               = this.data.level.images;
-        let sounds               = this.data.level.sounds;
-        let numberOfImages       = images.length;
-        let numberOfLoadedImages = 0;
+        this.loadImages(images, function () {
+            // This callback is executed at the end of the loading chain.
+            // With this, the game starts only when all assets are loaded.
 
-        // We nest callbacks here because we need all components to be loaded before we start the game.
-        // Load game only when images and sounds are loaded.
-        for (let i = 0; i < numberOfImages; i++) {
-            let image = new Image();
+            // Refresh game data on every tick
+            _this.io.socket.on('game', function (data) {
+                _this.tick.call(_this, data);
+            });
 
-            // ========================
-            // Start callback
-            image.onload = function () {
-                numberOfLoadedImages++;
-                // First, load images. When loaded, load sounds.
-                if (numberOfLoadedImages === numberOfImages) {
+            // Start the drawer loop
+            Drawer.startDrawing(_this);
 
-                    let numberOfAudio       = 0;
-                    let numberOfLoadedAudio = 0;
-
-                    for (let soundId in sounds) {
-                        if (!sounds.hasOwnProperty(soundId)) {
-                            continue;
-                        }
-                        numberOfAudio++;
-                    }
-                    for (let soundId in sounds) {
-                        if (!sounds.hasOwnProperty(soundId)) {
-                            continue;
-                        }
-                        let audio = new Audio(sounds[soundId]);
-
-                        // ========================
-                        // Start callback
-                        audio.addEventListener('canplaythrough', function () {
-                            numberOfLoadedAudio++;
-                            if (numberOfLoadedAudio === numberOfAudio) {
-                                // Finally !
-                                // Now we can set up the tick event received from the server.
-                                _this.io.socket.on('game', function (data) {
-                                    _this.tick.call(_this, data);
-                                });
-
-                                // ================
-                                // Start the game HERE
-                                Drawer.startDrawing(_this);
-                                _this.initListeners();
-                                // ================
-                            }
-                        }, false);
-                        // ========================
-                    }
-
-                }
-            };
-            // ========================
-            image.src    = images[i];
-        }
+            // Initialize key/touch listeners
+            _this.initListeners();
+        });
 
     },
 
@@ -206,6 +174,84 @@ Game.prototype = {
 
         bg.parentElement.style.width  = bg.width + 'px';
         bg.parentElement.style.height = bg.height + 'px';
+    },
+
+    /**
+     * Load images and execute final callback
+     *
+     * @param {Array}    images
+     * @param {Function} cb
+     */
+    loadImages: function (images, cb) {
+        let _this = this;
+        let numberOfImages       = images.length;
+        let numberOfLoadedImages = 0;
+
+        // Load game only when images and sounds are loaded.
+        for (let i = 0; i < numberOfImages; i++) {
+            let image = new Image();
+            let imageUrl = images[i];
+
+            // ========================
+            // Start callback
+            image.onload = function () {
+
+                _this.data.internalImages[imageUrl] = new GameModels.InternalImage(this, {
+                    x: -1 * Math.round(this.width / 2),
+                    y: -1 * Math.round(this.height / 2)
+                });
+
+                numberOfLoadedImages++;
+
+                // First, load images. When loaded, load sounds.
+                if (numberOfLoadedImages === numberOfImages) {
+                    _this.loadSounds(cb);
+                }
+            };
+            // ========================
+
+            image.src = imageUrl;
+        }
+    },
+
+    /**
+     * Load sounds and execute final callback
+
+     * @param {Function} cb
+     */
+    loadSounds: function (cb) {
+        let numberOfAudio       = 0;
+        let numberOfLoadedAudio = 0;
+        let sounds              = this.data.level.sounds;
+
+        for (let soundId in sounds) {
+            if (!sounds.hasOwnProperty(soundId)) {
+                continue;
+            }
+            numberOfAudio++;
+        }
+
+        for (let soundId in sounds) {
+            if (!sounds.hasOwnProperty(soundId)) {
+                continue;
+            }
+            let audio = new Audio(sounds[soundId]);
+
+            // ========================
+            // Start callback
+            audio.addEventListener('canplaythrough', function () {
+                numberOfLoadedAudio++;
+                if (numberOfLoadedAudio === numberOfAudio) {
+
+                    // ================
+                    // Start the game HERE
+                    // ================
+                    cb();
+                }
+            }, false);
+            // ========================
+        }
+
     },
 
     /**
