@@ -17,6 +17,8 @@ module.exports = {
             a: user.pick.angle,
             s: user.pick.speed,
             i: user.pick.imageUrl,
+            isz: { w: user.pick.spriteSize.width, h: user.pick.spriteSize.height },
+            is: user.pick.sprite,
             mr: user.pick.moveRatio,
             snd: user.soundsToPlay,
             nt: SocketLooper.numberOfTicks

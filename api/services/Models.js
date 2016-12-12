@@ -20,6 +20,7 @@ module.exports = {
      * @property {number} speed
      * @property {number} angleSpeed
      * @property {string|null} imageUrl
+     * @property {Array} sprite
      * @property {number} moveRatio
      */
     Pick: function (parameters) {
@@ -34,6 +35,8 @@ module.exports = {
         this.speed      = parameters.speed || 1;
         this.angleSpeed = parameters.angleSpeed || 2.5;
         this.imageUrl   = parameters.imageUrl || null;
+        this.spriteSize = parameters.spriteSize || { width: null, height: null };
+        this.sprite     = parameters.sprite || [];
         this.moveRatio  = 1; // 1 for "forward", -1 for "backwards",
     },
 

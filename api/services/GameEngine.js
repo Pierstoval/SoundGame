@@ -30,7 +30,18 @@ module.exports = {
             pick:             new Models.Pick({
                 x: Math.floor(Math.random() * level.mapWidth) + 1,
                 y: Math.floor(Math.random() * level.mapHeight) + 1,
-                imageUrl: '/images/pick.png'
+                imageUrl: '/images/picks/pick.png',
+                spriteSize: { width: 80, height: 80 },
+                sprite: [
+                    { x:   0, y: 0 },
+                    { x:  80, y: 0 },
+                    { x: 160, y: 0 },
+                    { x: 240, y: 0 },
+                    { x: 320, y: 0 },
+                    { x: 400, y: 0 },
+                    { x: 480, y: 0 },
+                    { x: 560, y: 0 }
+                ]
             }),
             movements:        {
                 left:  false,
