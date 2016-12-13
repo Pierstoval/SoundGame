@@ -263,15 +263,17 @@ Game.prototype = {
         let _this = this;
 
         // Update game data
-        this.data.pick.x         = data.x;
-        this.data.pick.y         = data.y;
-        this.data.pick.radius    = data.r;
-        this.data.pick.angle     = data.a;
-        this.data.pick.speed     = data.s;
-        this.data.pick.moveRatio = data.mr;
-        this.data.pick.imageUrl  = data.i;
-        this.data.soundsToPlay   = data.snd;
-        this.data.numberOfTicks  = data.nt;
+        this.data.pick.x          = Math.round(data.x);
+        this.data.pick.y          = Math.round(data.y);
+        this.data.pick.radius     = data.r;
+        this.data.pick.angle      = data.a;
+        this.data.pick.speed      = data.s;
+        this.data.pick.moveRatio  = data.mr;
+        this.data.pick.imageUrl   = data.i;
+        this.data.pick.spriteSize = data.isz;
+        this.data.pick.sprite     = data.is;
+        this.data.soundsToPlay    = data.snd;
+        this.data.numberOfTicks   = data.nt;
 
         let sounds       = this.data.level.sounds;
         let soundsToPlay = this.data.soundsToPlay;
