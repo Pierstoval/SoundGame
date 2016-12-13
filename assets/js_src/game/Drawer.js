@@ -17,9 +17,7 @@ module.exports = {
     lastData: null,
 
     // Used to make the pick look like it breathes
-    pickBreatheMax: 50,
-    pickBreatheValue: 0,
-    pickBreatheIncrement: 0.5,
+    pickCurrentSpriteValue: 0,
 
     /**
      * @param {Game} game
@@ -63,7 +61,7 @@ module.exports = {
                 return;
             }
             if (document.getElementById('debug')) {
-                document.getElementById('debug').innerHTML = stringData;
+                // document.getElementById('debug').innerHTML = stringData;
             }
         }
 
@@ -89,51 +87,27 @@ module.exports = {
 
     drawUserPick: function (game, context, x, y, radius) {
         let pickImage = game.data.pick.imageUrl;
+        let sprite = game.data.pick.sprite;
+        let currentSprite = sprite[Math.round(this.pickCurrentSpriteValue)];
+
+        let internalImage = game.data.internalImages[pickImage];
+        let pickWidth = game.data.pick.spriteSize.w;
+        let pickHeight = game.data.pick.spriteSize.h;
 
         context.save();
-
-        context.shadowBlur    = Math.round(this.pickBreatheValue);
-        context.shadowOffsetX = 0;
-        context.shadowOffsetY = 0;
-
-        context.lineWidth   = 0;
-        context.fillStyle   = '#222';
-        context.shadowColor = "#0398fe";
-
-        // Draw shadow multiple times to reinforce its visual aspect
-        for (let i = 0; i < 2; i++) {
-            context.beginPath();
-            context.arc(x, y, 5, 0, Math.PI * 2, true);
-            context.fill();
-        }
-
+        context.translate(x - Math.round(pickWidth / 2), y - Math.round(pickHeight / 2));
+        context.drawImage(internalImage.getImage(), currentSprite.x, currentSprite.y, pickWidth, pickHeight, 0, 0, pickWidth, pickHeight);
         context.restore();
 
-        // Draw pick
-        context.save();
+        let incr = 0.25;
 
-        if (pickImage) {
-            Helpers.drawImage(context, x, y, 0, game.data.internalImages[pickImage]);
+        // If next sprite exists, let's use it
+        if (sprite[Math.round(this.pickCurrentSpriteValue + incr)]) {
+            this.pickCurrentSpriteValue += incr;
         } else {
-            context.fillStyle = '#cccccc';
-            context.beginPath();
-            context.arc(x, y, radius, 0, Math.PI * 2, true);
-            context.fill();
+            // Else, return to sprite zero
+            this.pickCurrentSpriteValue = 0;
         }
-
-        context.restore();
-
-        // Handle breathing values change
-        this.pickBreatheValue += this.pickBreatheIncrement;
-
-        let incr = Math.abs(this.pickBreatheIncrement);
-
-        if (this.pickBreatheValue >= this.pickBreatheMax) {
-            this.pickBreatheIncrement = -1 * incr;
-        } else if (this.pickBreatheValue <= (2 * radius)) {
-            this.pickBreatheIncrement = incr;
-        }
-
     },
 
     /**
