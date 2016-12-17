@@ -31,23 +31,24 @@ class Helpers {
     }
 
     /**
-     * @function
-     * @param {string} sound
-     * @param {number} delay
+     * @param {GameNoteModel} gameNote
      * @param {Object} sounds
      */
-    static playSound(sound, delay, sounds) {
-        if (!sounds[sound]) {
-            console.error('Sound id "' + sound + '" does not exist.');
+    static playSound(gameNote, sounds) {
+        let sound = gameNote.note.sound;
+        let delay = gameNote.soundDelay;
+
+        if (sounds.indexOf(sound) < 0) {
+            console.error('Sound id "' + gameNote + '" does not exist.');
             return;
         }
 
         if (delay) {
             setTimeout(function () {
-                (new Audio(sounds[sound])).play()
+                (new Audio(sound)).play()
             }, delay);
         } else {
-            (new Audio(sounds[sound])).play();
+            (new Audio(sound)).play();
         }
     }
 
