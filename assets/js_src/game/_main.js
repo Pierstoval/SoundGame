@@ -2,6 +2,11 @@ let Game = require('./Game');
 // Should be dumped to js/app.js
 (function (w, io) {
 
-    new Game(w, io).start();
+    try {
+        new Game(w, io).start();
+    } catch (e) {
+        console.error('Exception occured in game');
+        console.error(e);
+    }
 
 })(window, io);
