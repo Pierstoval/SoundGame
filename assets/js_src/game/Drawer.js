@@ -72,10 +72,10 @@ module.exports = {
         /**
          * @type {CanvasRenderingContext2D}
          */
-        let world     = game.worldContext;
-        let x         = game.data.pick.x;
-        let y         = game.data.pick.y;
-        let radius    = game.data.pick.radius;
+        let world  = game.worldContext;
+        let x      = game.data.pick.x;
+        let y      = game.data.pick.y;
+        let radius = game.data.pick.radius;
 
         // Clear the whole canvas to redraw it
         world.save();
@@ -88,13 +88,13 @@ module.exports = {
     },
 
     drawUserPick: function (game, context, x, y, radius) {
-        let pickImage = game.data.pick.imageUrl;
-        let sprite = game.data.pick.sprite;
+        let pickImage     = game.data.pick.imageUrl;
+        let sprite        = game.data.pick.sprite;
         let currentSprite = sprite[Math.round(this.pickCurrentSpriteValue)];
 
         let internalImage = game.data.internalImages[pickImage];
-        let pickWidth = game.data.pick.spriteSize.w;
-        let pickHeight = game.data.pick.spriteSize.h;
+        let pickWidth     = game.data.pick.spriteSize.width;
+        let pickHeight    = game.data.pick.spriteSize.height;
 
         context.save();
         context.translate(x - Math.round(pickWidth / 2), y - Math.round(pickHeight / 2));
@@ -138,29 +138,38 @@ module.exports = {
         /**
          * @type {CanvasRenderingContext2D}
          */
-        let backgroundContext = game.backgroundContext;
-        let notes             = game.data.level.notes;
-        let images            = game.data.level.images;
+        let context = game.backgroundContext;
+        let notes   = game.data.level.notes;
 
         // Draw notes
         for (let i = 0, l = notes.length; i < l; i++) {
             // Notes are serialized, so we need to remember that properties are shortened ones coming from the app
             let note = notes[i];
 
-            if (images[note.i]) {
-                Helpers.drawImage(backgroundContext, note.x, note.y, 0, images[note.i]);
-            } else {
-                let imageObj    = new Image();
-                imageObj._note  = note;
-                imageObj.src    = note.i;
-                imageObj.onload = function () {
-                    game.data.level.images[this._note.i] = new GameModels.InternalImage(this, {
-                        x: -1 * this.width / 2,
-                        y: -1 * this.height / 10
-                    });
-                    Helpers.drawImage(backgroundContext, this._note.x, this._note.y, 0, images[this._note.i]);
-                };
-            }
+            let internalImage = game.data.internalImages[note.s];
+            let x             = note.x;
+            let y             = note.y;
+            let radius        = note.r;
+            let noteWidth     = note.ss.w;
+            let noteHeight    = note.ss.h;
+            let spriteX       = note.active ? note.sap.x : note.sdp.x;
+            let spriteY       = note.active ? note.sap.y : note.sdp.y;
+
+            context.save();
+            context.translate(x - Math.round(noteWidth / 2), y - Math.round(noteHeight / 2));
+            context.drawImage(internalImage.getImage(), spriteX, spriteY, noteWidth, noteHeight, 0, 0, noteWidth, noteHeight);
+            context.restore();
+
+            /*/
+            // Draw circle for collision debug
+            context.save();
+            context.beginPath();
+            context.lineWidth = 0.5;
+            context.strokeStyle = '#000000';
+            context.arc(x, y, radius, 0, Math.PI * 2);
+            context.stroke();
+            context.restore();
+            //*/
         }
 
     }
