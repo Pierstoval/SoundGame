@@ -22,45 +22,9 @@ module.exports = {
      */
     addUserFromSocketRequest: function (req) {
 
-        let level = require('../game_levels/level_1');
+        let level = new LevelModel(1);
 
-        let user = {
-            id:               req.socket.id,
-            rendered:         false,
-            soundsToPlay:     [],
-            pick:             new Models.Pick({
-                x: Math.floor(Math.random() * level.mapWidth) + 1,
-                y: Math.floor(Math.random() * level.mapHeight) + 1,
-                imageUrl: '/images/picks/pick.png',
-                spriteSize: { width: 64, height: 64 },
-                sprite: [
-                    { x:   0, y: 0 },
-                    { x:  64, y: 0 },
-                    { x: 128, y: 0 },
-                    { x: 192, y: 0 },
-                    { x: 256, y: 0 },
-                    { x: 320, y: 0 },
-                    { x: 384, y: 0 },
-                    { x: 448, y: 0 },
-                    { x: 512, y: 0 },
-                    { x: 576, y: 0 },
-                    { x: 640, y: 0 },
-                    { x: 704, y: 0 },
-                    { x: 768, y: 0 },
-                    { x: 832, y: 0 },
-                    { x: 896, y: 0 },
-                    { x: 960, y: 0 },
-                ]
-            }),
-            movements:        {
-                left:  false,
-                right: false,
-                up:    false,
-                down:  false,
-            },
-            collidingObjects: {},
-            level: level,
-        };
+        let user = new GameUserModel(req, level);
 
         this.users[req.socket.id] = user;
 
@@ -111,16 +75,16 @@ module.exports = {
             ) {
 
                 // Test collisions ONLY if we moved
-                for (let i = 0, l = user.level.notes.length; i < l; i++) {
-                    let note            = user.level.notes[i];
-                    let collides        = CollisionsManager.testPickAndNoteCollide(user.pick, note);
-                    let alreadyCollides = user.collidingObjects[note.uuid];
+                for (let i = 0, l = user.level.data.notes.length; i < l; i++) {
+                    let gameNote        = user.level.data.notes[i];
+                    let collides        = CollisionsManager.testPickAndNoteCollide(user.pick, gameNote);
+                    let alreadyCollides = user.collidingObjects[gameNote.uuid];
 
                     if (collides && !alreadyCollides) {
-                        data.snd.push(note.soundEvent);
-                        user.collidingObjects[note.uuid] = note;
+                        data.snd.push(gameNote);
+                        user.collidingObjects[gameNote.uuid] = gameNote;
                     } else if (!collides && alreadyCollides) {
-                        delete user.collidingObjects[note.uuid];
+                        delete user.collidingObjects[gameNote.uuid];
                     }
                 }
 
@@ -186,10 +150,10 @@ module.exports = {
             let y = user.pick.y + (moveRatio * user.pick.speed * Math.cos(angleRadians));
 
             // Avoids collisions with canvas walls
-            if (x >= 0 && x <= user.level.mapWidth) {
+            if (x >= 0 && x <= user.level.data.mapWidth) {
                 user.pick.x = Math.round(x * 100) / 100;
             }
-            if (y >= 0 && y <= user.level.mapHeight) {
+            if (y >= 0 && y <= user.level.data.mapHeight) {
                 user.pick.y = Math.round(y * 100) / 100;
             }
         }
