@@ -1,19 +1,15 @@
 let GameModels = require('./GameModels');
 
-/**
- * @module Helpers
- */
-module.exports = {
+class Helpers {
 
     /**
-     * @function
      * @param {CanvasRenderingContext2D} context
      * @param {Number} x
      * @param {Number} y
      * @param {float} angleRadians
      * @param {GameModels.InternalImage} internalImage
      */
-    drawImage: function(context, x, y, angleRadians, internalImage) {
+    static drawImage(context, x, y, angleRadians, internalImage) {
         if (!(internalImage instanceof GameModels.InternalImage)) {
             console.error('Trying to draw something else than an InternalImage object', internalImage);
             return;
@@ -32,7 +28,7 @@ module.exports = {
         context.translate(internalImage.getCenterPoint().x, internalImage.getCenterPoint().y);
         context.drawImage(internalImage.getImage(), 0, 0);
         context.restore();
-    },
+    }
 
     /**
      * @function
@@ -40,7 +36,7 @@ module.exports = {
      * @param {number} delay
      * @param {Object} sounds
      */
-    playSound: function(sound, delay, sounds) {
+    static playSound(sound, delay, sounds) {
         if (!sounds[sound]) {
             console.error('Sound id "' + sound + '" does not exist.');
             return;
@@ -53,6 +49,8 @@ module.exports = {
         } else {
             (new Audio(sounds[sound])).play();
         }
-    },
+    }
 
-};
+}
+
+module.exports = Helpers;
