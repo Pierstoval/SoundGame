@@ -107,21 +107,26 @@ Game.prototype = {
             return;
         }
 
-        this.data.map.width  = gameData.w;
-        this.data.map.height = gameData.h;
+        let user  = Serializer.deserializeUser(gameData.u);
+        let level = Serializer.deserializeLevel(gameData.l);
 
-        this.data.level.name   = gameData.ln;
-        this.data.level.sounds = gameData.s;
-        this.data.level.images = gameData.i;
-        this.data.level.notes  = gameData.n;
+        this.updateUser(user);
+
+        this.data.map.width  = level.data.mapWidth;
+        this.data.map.height = level.data.mapHeight;
+
+        this.data.level.name   = level.data.name;
+        this.data.level.sounds = level.sounds;
+        this.data.level.images = level.images;
+        this.data.level.notes  = level.data.notes;
 
         this.data.internalImages = {};
 
-        let images = this.data.level.images;
+        let images = this.data.level.images || [];
 
         // Add pick to internal images for it to be loaded too
-        if (gameData.u.i) {
-            images.push(gameData.u.i);
+        if (user.pick.imageUrl) {
+            images.push(user.pick.imageUrl);
         }
 
         this.data.images = images;
@@ -187,13 +192,13 @@ Game.prototype = {
      * @param {Function} cb
      */
     loadImages: function (images, cb) {
-        let _this = this;
+        let _this                = this;
         let numberOfImages       = images.length;
         let numberOfLoadedImages = 0;
 
         // Load game only when images and sounds are loaded.
         for (let i = 0; i < numberOfImages; i++) {
-            let image = new Image();
+            let image    = new Image();
             let imageUrl = images[i];
 
             // ========================
@@ -276,7 +281,9 @@ Game.prototype = {
 
         // Play sounds that have to be played
         for (let i = 0, l = soundsToPlay.length; i < l; i++) {
-            Helpers.playSound(soundsToPlay[i].soundId, soundsToPlay[i].delay, sounds);
+            /** @type {GameNoteModel} sound */
+            let gameNote = soundsToPlay[i];
+            Helpers.playSound(gameNote, sounds);
         }
         this.data.soundsToPlay = [];
 
