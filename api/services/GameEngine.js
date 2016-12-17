@@ -1,3 +1,4 @@
+const Serializer = require('../../common_scripts/Serializer');
 /**
  * @namespace GameEngine
  */
@@ -98,7 +99,7 @@ module.exports = {
 
             this.applyMovement(user);
 
-            let data = Serializer.serializeDataFromUser(user);
+            let data = Serializer.serializeUser(user);
 
             if (
                 !user.rendered

@@ -60,9 +60,11 @@ module.exports = {
                 // Don't redraw if data has not changed.
                 return;
             }
+            /*
             if (document.getElementById('debug')) {
-                // document.getElementById('debug').innerHTML = stringData;
+                document.getElementById('debug').innerHTML = stringData;
             }
+            //*/
         }
 
         this.lastData = stringData;
@@ -100,6 +102,17 @@ module.exports = {
         context.restore();
 
         let incr = 0.25;
+
+        /*/
+        // Draw circle for collision debug
+        context.save();
+        context.beginPath();
+        context.lineWidth = 0.5;
+        context.strokeStyle = '#000000';
+        context.arc(x, y, radius, 0, Math.PI * 2);
+        context.stroke();
+        context.restore();
+        //*/
 
         // If next sprite exists, let's use it
         if (sprite[Math.round(this.pickCurrentSpriteValue + incr)]) {

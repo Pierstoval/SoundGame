@@ -1,3 +1,7 @@
+
+let keyMovements = require('../../../common_scripts/allowedKeyCodes');
+let Serializer   = require('../../../common_scripts/Serializer');
+
 /**
  * Only here to apply constructor to "Game.init()"
  *
@@ -263,17 +267,9 @@ Game.prototype = {
         let _this = this;
 
         // Update game data
-        this.data.pick.x          = Math.round(data.x);
-        this.data.pick.y          = Math.round(data.y);
-        this.data.pick.radius     = data.r;
-        this.data.pick.angle      = data.a;
-        this.data.pick.speed      = data.s;
-        this.data.pick.moveRatio  = data.mr;
-        this.data.pick.imageUrl   = data.i;
-        this.data.pick.spriteSize = data.isz;
-        this.data.pick.sprite     = data.is;
-        this.data.soundsToPlay    = data.snd;
-        this.data.numberOfTicks   = data.nt;
+        let user = Serializer.deserializeUser(data);
+
+        this.updateUser(user);
 
         let sounds       = this.data.level.sounds;
         let soundsToPlay = this.data.soundsToPlay;
@@ -295,13 +291,6 @@ Game.prototype = {
     initListeners: function () {
         let game = this;
 
-        const keyMovements = {
-            37: 'left',
-            38: 'up',
-            39: 'right',
-            40: 'down'
-        };
-
         /**
          * Key events to send via websocket
          */
@@ -312,28 +301,45 @@ Game.prototype = {
                 return false;
             }
 
+            if (!keyMovements[event.keyCode]) {
+                return false;
+            }
+
             game.pressed_keys[event.keyCode] = true;
 
             game.io.socket.post('/s/game/keydown', {
                 key_code: event.keyCode
             });
 
-            if (keyMovements[event.keyCode]) {
-                event.preventDefault();
-            }
+            event.preventDefault();
         });
 
         this.document.addEventListener('keyup', function (event) {
             game.pressed_keys[event.keyCode] = false;
 
+            if (!keyMovements[event.keyCode]) {
+                return false;
+            }
+
             game.io.socket.post('/s/game/keyup', {
                 key_code: event.keyCode
             });
 
-            if (keyMovements[event.keyCode]) {
-                event.preventDefault();
-            }
+            event.preventDefault();
         });
+    },
+
+    updateUser: function(user) {
+        this.data.pick.x          = Math.round(user.pick.x);
+        this.data.pick.y          = Math.round(user.pick.y);
+        this.data.pick.radius     = user.pick.radius;
+        this.data.pick.angle      = user.pick.angle;
+        this.data.pick.speed      = user.pick.speed;
+        this.data.pick.moveRatio  = user.pick.moveRatio;
+        this.data.pick.imageUrl   = user.pick.imageUrl;
+        this.data.pick.spriteSize = user.pick.spriteSize;
+        this.data.pick.sprite     = user.pick.sprite;
+        this.data.soundsToPlay    = user.soundsToPlay;
     }
 };
 

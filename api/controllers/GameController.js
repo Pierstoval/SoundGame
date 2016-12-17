@@ -1,10 +1,6 @@
 
-const keyMovements = {
-    37: 'left',
-    38: 'up',
-    39: 'right',
-    40: 'down'
-};
+let Serializer = require('../../common_scripts/Serializer');
+let keyMovements = require('../../common_scripts/allowedKeyCodes');
 
 module.exports = {
     socketRegister: function (req, res) {
@@ -14,7 +10,7 @@ module.exports = {
 
         let user = GameEngine.addUserFromSocketRequest(req);
 
-        return res.ok(Serializer.serializeWorldFromUser(user));
+        return res.ok(Serializer.serializeOnRegistration(user));
     },
 
     socketSetRendered: function (req, res) {
