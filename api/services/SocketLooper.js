@@ -72,8 +72,8 @@ module.exports = {
 
     // Allow us to debug
     checkSeconds: function(){
-        var d = new Date(),
-            second = d.getSeconds();
+        let d = new Date();
+        let second = d.getSeconds();
 
         if (null === this.lastSecond) {
             this.lastSecond = second;
