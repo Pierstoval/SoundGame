@@ -31,8 +31,8 @@ Game.prototype = {
 
     io: null,
 
-    // Avoids sending key events all the time for the same key, saves memory
-    pressed_keys: {},
+    // Avoids sending events all the time when clicking, improves socket performances
+    mouse_active: false,
 
     rendered: false,
 
@@ -298,42 +298,49 @@ Game.prototype = {
     initListeners: function () {
         let game = this;
 
-        /**
-         * Key events to send via websocket
-         */
-        this.document.addEventListener('keydown', function (event) {
-            if (game.pressed_keys[event.keyCode]) {
+        let downEvent = function (event) {
+            if (game.mouse_active) {
                 // Avoids sending this event too often for the same key
                 // (and avoids some hacks too, even if we're clien-side here...)
                 return false;
             }
 
-            if (!keyMovements[event.keyCode]) {
-                return false;
-            }
+            game.mouse_active = true;
 
-            game.pressed_keys[event.keyCode] = true;
-
-            game.io.socket.post('/s/game/keydown', {
-                key_code: event.keyCode
+            game.io.socket.post('/s/game/down_event', {
+                x: event.offsetX,
+                y: event.offsetY,
             });
 
             event.preventDefault();
-        });
+        };
 
-        this.document.addEventListener('keyup', function (event) {
-            game.pressed_keys[event.keyCode] = false;
+        let upEvent = function (event) {
+            game.mouse_active = false;
 
-            if (!keyMovements[event.keyCode]) {
-                return false;
-            }
-
-            game.io.socket.post('/s/game/keyup', {
-                key_code: event.keyCode
+            game.io.socket.post('/s/game/up_event', {
+                x: event.offsetX,
+                y: event.offsetY,
             });
 
             event.preventDefault();
-        });
+        };
+
+        let canvases = [
+            this.background,
+            this.world,
+            this.ui
+        ];
+
+        for (let i = 0, l = canvases.length; i < l; i++) {
+            canvases[i].addEventListener('mousedown', downEvent);
+            canvases[i].addEventListener('mouseup', upEvent);
+
+            canvases[i].addEventListener('touchstart', downEvent);
+            canvases[i].addEventListener('touchend', upEvent);
+            canvases[i].addEventListener('touchcancel', upEvent);
+        }
+
     },
 
     updateUser: function(user) {
