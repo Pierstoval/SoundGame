@@ -9,8 +9,8 @@ let notes = {
             height: 64,
         },
         spriteDefaultPosition: {
-            x: 256,
-            y: 64,
+            x: 0,
+            y: 0,
         },
         spriteActivePosition: {
             x: 0,
@@ -26,8 +26,8 @@ let notes = {
             height: 64,
         },
         spriteDefaultPosition: {
-            x: 256,
-            y: 64,
+            x: 0,
+            y: 0,
         },
         spriteActivePosition: {
             x: 64,
@@ -43,8 +43,8 @@ let notes = {
             height: 64,
         },
         spriteDefaultPosition: {
-            x: 256,
-            y: 64,
+            x: 0,
+            y: 0,
         },
         spriteActivePosition: {
             x: 0,
@@ -60,8 +60,8 @@ let notes = {
             height: 64,
         },
         spriteDefaultPosition: {
-            x: 256,
-            y: 64,
+            x: 0,
+            y: 0,
         },
         spriteActivePosition: {
             x: 0,
@@ -77,8 +77,8 @@ let notes = {
             height: 64,
         },
         spriteDefaultPosition: {
-            x: 256,
-            y: 64,
+            x: 0,
+            y: 0,
         },
         spriteActivePosition: {
             x: 0,
@@ -94,8 +94,8 @@ let notes = {
             height: 64,
         },
         spriteDefaultPosition: {
-            x: 256,
-            y: 64,
+            x: 0,
+            y: 0,
         },
         spriteActivePosition: {
             x: 0,
@@ -111,8 +111,8 @@ let notes = {
             height: 64,
         },
         spriteDefaultPosition: {
-            x: 256,
-            y: 64,
+            x: 0,
+            y: 0,
         },
         spriteActivePosition: {
             x: 0,
@@ -128,8 +128,8 @@ let notes = {
             height: 64,
         },
         spriteDefaultPosition: {
-            x: 256,
-            y: 64,
+            x: 0,
+            y: 0,
         },
         spriteActivePosition: {
             x: 0,
@@ -145,8 +145,8 @@ let notes = {
             height: 64,
         },
         spriteDefaultPosition: {
-            x: 256,
-            y: 64,
+            x: 0,
+            y: 0,
         },
         spriteActivePosition: {
             x: 0,
@@ -162,8 +162,8 @@ let notes = {
             height: 64,
         },
         spriteDefaultPosition: {
-            x: 256,
-            y: 64,
+            x: 0,
+            y: 0,
         },
         spriteActivePosition: {
             x: 0,
@@ -179,8 +179,8 @@ let notes = {
             height: 64,
         },
         spriteDefaultPosition: {
-            x: 256,
-            y: 64,
+            x: 0,
+            y: 0,
         },
         spriteActivePosition: {
             x: 0,
@@ -196,8 +196,8 @@ let notes = {
             height: 64,
         },
         spriteDefaultPosition: {
-            x: 256,
-            y: 64,
+            x: 0,
+            y: 0,
         },
         spriteActivePosition: {
             x: 0,
