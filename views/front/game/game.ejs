@@ -1,8 +1,8 @@
 
 <div class="canvas_container">
-    <canvas id="background" class="game_canvas" style="z-index: 0;"></canvas>
-    <canvas id="world" class="game_canvas" style="z-index: 1;"></canvas>
-    <canvas id="ui" class="game_canvas" style="z-index: 2;"></canvas>
+    <canvas class="game_canvas" style="z-index: 0;" id="background"></canvas>
+    <canvas class="game_canvas" style="z-index: 1;" id="world"></canvas>
+    <canvas class="game_canvas" style="z-index: 2;" id="ui"></canvas>
 </div>
 <% if (sails.config.environment === 'development') { %>
 <div id="debug" style="font-family: monospace;"></div>
