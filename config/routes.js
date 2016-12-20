@@ -35,8 +35,7 @@ module.exports.routes = {
     // Game
     'GET /game/start':           'GameController.start',
     'GET /game/game':            'GameController.game',
-    'POST /s/game/keydown':      'GameController.socketKeyDown',
-    'POST /s/game/keyup':        'GameController.socketKeyUp',
+    'POST /s/game/event':        'GameController.socketEvent',
     'POST /s/game/register':     'GameController.socketRegister',
     'POST /s/game/disconnect':   'GameController.socketDisconnect',
     'POST /s/game/set_rendered': 'GameController.socketSetRendered',

@@ -1,5 +1,4 @@
 
-let keyMovements = require('../../../common_scripts/allowedKeyCodes');
 let Serializer   = require('../../../common_scripts/Serializer');
 
 /**
@@ -32,7 +31,11 @@ Game.prototype = {
     io: null,
 
     // Avoids sending events all the time when clicking, improves socket performances
-    mouse_active: false,
+    movementIsActive: false,
+
+    // Avoids sending tons of movementst at the same time.
+    // Only sends movements sequentially.
+    movementSocketActive: false,
 
     rendered: false,
 
@@ -295,19 +298,27 @@ Game.prototype = {
 
     },
 
+    /**
+     * Lots of events here.
+     * All events should be handled by the "ui" canvas, which has high z-index.
+     * The server handles every action behind this.
+     * Client does nothing else than say "I pinched here".
+     * Max security, if there could be :)
+     */
     initListeners: function () {
         let game = this;
 
         let downEvent = function (event) {
-            if (game.mouse_active) {
+            if (game.movementIsActive) {
                 // Avoids sending this event too often for the same key
                 // (and avoids some hacks too, even if we're clien-side here...)
                 return false;
             }
 
-            game.mouse_active = true;
+            game.movementIsActive = true;
 
-            game.io.socket.post('/s/game/down_event', {
+            game.io.socket.post('/s/game/event', {
+                type: 'down',
                 x: event.offsetX,
                 y: event.offsetY,
             });
@@ -316,9 +327,15 @@ Game.prototype = {
         };
 
         let upEvent = function (event) {
-            game.mouse_active = false;
+            if (!game.movementIsActive) {
+                // Send this event ONLY when touch/click is active
+                return false;
+            }
 
-            game.io.socket.post('/s/game/up_event', {
+            game.movementIsActive = false;
+
+            game.io.socket.post('/s/game/event', {
+                type: 'up',
                 x: event.offsetX,
                 y: event.offsetY,
             });
@@ -326,20 +343,36 @@ Game.prototype = {
             event.preventDefault();
         };
 
-        let canvases = [
-            this.background,
-            this.world,
-            this.ui
-        ];
+        let moveEvent = function(event) {
+            let _this = this;
 
-        for (let i = 0, l = canvases.length; i < l; i++) {
-            canvases[i].addEventListener('mousedown', downEvent);
-            canvases[i].addEventListener('mouseup', upEvent);
+            if (!game.movementIsActive || this.movementSocketActive) {
+                // Send this event ONLY when touch/click is active
+                return false;
+            }
 
-            canvases[i].addEventListener('touchstart', downEvent);
-            canvases[i].addEventListener('touchend', upEvent);
-            canvases[i].addEventListener('touchcancel', upEvent);
-        }
+            this.movementSocketActive = true;
+
+            game.io.socket.post('/s/game/event', {
+                type: 'move',
+                x: event.offsetX,
+                y: event.offsetY,
+            }, function() {
+                _this.movementSocketActive = false;
+            });
+
+            event.preventDefault();
+        };
+
+        // "up" event is sent on the document itself
+        this.ui.addEventListener('mousedown', downEvent);
+        this.ui.addEventListener('mousemove', moveEvent);
+        this.document.addEventListener('mouseup', upEvent);
+
+        this.ui.addEventListener('touchstart', downEvent);
+        this.ui.addEventListener('touchmove', moveEvent);
+        this.document.addEventListener('touchend', upEvent);
+        this.document.addEventListener('touchcancel', upEvent);
 
     },
 
@@ -349,7 +382,6 @@ Game.prototype = {
         this.data.pick.radius     = user.pick.radius;
         this.data.pick.angle      = user.pick.angle;
         this.data.pick.speed      = user.pick.speed;
-        this.data.pick.moveRatio  = user.pick.moveRatio;
         this.data.pick.imageUrl   = user.pick.imageUrl;
         this.data.pick.spriteSize = user.pick.spriteSize;
         this.data.pick.sprite     = user.pick.sprite;

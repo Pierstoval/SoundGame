@@ -1,6 +1,5 @@
 
 let Serializer = require('../../common_scripts/Serializer');
-let keyMovements = require('../../common_scripts/allowedKeyCodes');
 
 module.exports = {
     socketRegister: function (req, res) {
@@ -41,31 +40,7 @@ module.exports = {
         return res.ok();
     },
 
-    socketKeyDown: function (req, res) {
-        if (!req.isSocket) {
-            return res.badRequest();
-        }
-
-        let socketId = req.socket.id;
-
-        if (!GameEngine.users[socketId]) {
-            let msg = 'Invalid socket id for keyDown action';
-            sails.log.warn(msg);
-            return res.status(500).send(msg);
-        }
-
-        let keyCode = req.param('key_code');
-        let keyMovementString = keyMovements[keyCode];
-
-        // Apply movement to key down
-        if (keyMovementString) {
-            GameEngine.changeMovement(socketId, keyMovementString, true);
-        }
-
-        return res.ok();
-    },
-
-    socketKeyUp: function (req, res) {
+    socketEvent: function (req, res) {
         if (!req.isSocket) {
             return res.badRequest();
         }
@@ -78,13 +53,24 @@ module.exports = {
             return res.status(500).send(msg);
         }
 
-        // Stop movement on key up
-        let keyCode = req.param('key_code');
-        let keyMovementString = keyMovements[keyCode];
+        let type = req.param('type');
+        let x = req.param('x');
+        let y = req.param('y');
 
-        // Apply movement to key down
-        if (keyMovementString) {
-            GameEngine.changeMovement(socketId, keyMovementString, false);
+        // TODO: Check UI before calculating movement when we have one
+        switch (type) {
+            case 'up':
+                // mouse/touch "up" => stop movement
+                GameEngine.changeMovement(socketId, x, y, false);
+                break;
+            case 'down':
+            case 'move':
+                // mouse/touch "down" and "move" => start movement
+                GameEngine.changeMovement(socketId, x, y, true);
+                break;
+            default:
+                console.warn('Unknown event type "'+type+'".');
+                break;
         }
 
         return res.ok();

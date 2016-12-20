@@ -16,11 +16,12 @@ module.exports = {
             r: user.pick.radius,
             a: user.pick.angle,
             s: user.pick.speed,
+            ac: user.pick.acceleration,
+            ms: user.pick.maxSpeed,
             i: user.pick.imageUrl,
             is: user.pick.sprite,
             isw: user.pick.spriteSize.width,
             ish: user.pick.spriteSize.height,
-            mr: user.pick.moveRatio,
             snd: user.soundsToPlay || [],
         };
     },
@@ -29,7 +30,7 @@ module.exports = {
      *
      * @param {Object} serializedUser
      *
-     * @returns {{pick: {x, y, radius: number, angle: number, speed: number, imageUrl, sprite: string, moveRatio: number, spriteSize: {width: number, height: number}}, soundsToPlay: Array}}
+     * @returns {{pick: {x, y, radius: number, angle: number, speed: number, imageUrl, sprite: string, spriteSize: {width: number, height: number}}, soundsToPlay: Array}}
      */
     deserializeUser: function (serializedUser) {
         return {
@@ -39,9 +40,10 @@ module.exports = {
                 radius: serializedUser.r,
                 angle: serializedUser.a,
                 speed: serializedUser.s,
+                acceleration: serializedUser.ac,
+                maxSpeed: serializedUser.ms,
                 imageUrl: serializedUser.i,
                 sprite: serializedUser.is,
-                moveRatio: serializedUser.mr,
                 spriteSize: {
                     width: serializedUser.isw,
                     height: serializedUser.ish,

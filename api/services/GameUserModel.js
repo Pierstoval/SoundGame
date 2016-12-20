@@ -46,12 +46,7 @@ module.exports = function (req, level) {
         ]
     });
 
-    this.movements = {
-        left:  false,
-        right: false,
-        up:    false,
-        down:  false,
-    };
+    this.pressingMovementKey = false;
 
     this.collidingObjects = {};
 
