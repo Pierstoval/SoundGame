@@ -1,3 +1,8 @@
 {
-    "projet_perso": "This is a very small personal project. If you have access to this site, you should certainly know how to contact me, and I invite you to do so if you find any bug ;)"
+	"projet_perso": "This is a very small personal project. If you have access to this site, you should certainly know how to contact me, and I invite you to do so if you find any bug ;)",
+	"homepage_title": "homepage_title",
+	"sound_game_presentation": "sound_game_presentation",
+	"play": "play",
+	"login": "login",
+	"register": "register"
 }

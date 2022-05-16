@@ -13,6 +13,10 @@ module.exports = function flashMessages(sails) {
                 'all /*': function (req, res, next) {
                     let session = req.session;
 
+                    if (!session) {
+                        return;
+                    }
+
                     if (typeof session[_session_key] === 'undefined') {
                         session[_session_key] = {};
                     }
