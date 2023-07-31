@@ -31,7 +31,7 @@
     "jquery": "^3.6.0",
     "materialize-css": "^1.0.0",
     "rc": "^1.2.8",
-    "sails": "^1.5.2",
+    "sails": "^1.5.7",
     "sails-disk": "^2.1.1",
     "uuid": "^8.3.2"
   },
